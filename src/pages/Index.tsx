@@ -21,7 +21,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   return <Card onClick={onClick} className="hover:translate-y-[-2px] transition-transform duration-300">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-primary/10 rounded-full text-primary">
+        <div className="p-3 bg-cargo-orange/10 rounded-full text-cargo-orange">
           {icon}
         </div>
         <div className="flex-1">
@@ -58,14 +58,14 @@ const Index = () => {
   const hasSavedWork = localStorage.getItem('savedProducts') !== null;
   
   return <PageTransition>
-      <div className="flex flex-col min-h-screen">
-        <Header title="PrevioApp" />
+      <div className="flex flex-col min-h-screen bg-cargo-light">
+        <Header title="Cargo Claro" />
         
         <main className="flex-1 px-4 py-6 container max-w-md mx-auto">
           <section className="space-y-6 animate-slide-up">
             <div className="space-y-2">
-              <h2 className="text-2xl font-medium tracking-tight">Proyectos Compartidos</h2>
-              <p className="text-muted-foreground">Selecciona un proyecto para comenzar a trabajar</p>
+              <h2 className="text-2xl font-medium tracking-tight">Dashboard de Previos</h2>
+              <p className="text-muted-foreground">Selecciona una opción para comenzar a trabajar</p>
             </div>
             
             <div className="grid gap-4">

@@ -53,6 +53,13 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				cargo: {
+					orange: '#FF6B39',
+					light: '#F5F7FA',
+					blue: '#7FB0C6',
+					darkblue: '#536D7B',
+					gray: '#EAECF0',
+				},
 				previo: {
 					50: '#f5f8fa',
 					100: '#eaf0f5',

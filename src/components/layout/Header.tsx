@@ -21,21 +21,35 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
   return (
     <header 
       className={cn(
-        "sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border py-4 px-6",
+        "sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-cargo-gray py-4 px-6 shadow-sm",
         className
       )}
     >
-      <div className="flex items-center">
-        {showBackButton && location.pathname !== '/' && (
-          <button 
-            onClick={handleBack}
-            className="mr-3 rounded-full p-1 hover:bg-secondary transition-colors"
-            aria-label="Back"
-          >
-            <ArrowLeft size={20} />
-          </button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          {showBackButton && location.pathname !== '/' && (
+            <button 
+              onClick={handleBack}
+              className="mr-3 rounded-full p-1 hover:bg-cargo-gray transition-colors"
+              aria-label="Back"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          <h1 className="text-xl font-medium">{title}</h1>
+        </div>
+        {location.pathname === '/' && (
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/5fb656fd-06e2-44f8-9b8b-343ebe591e4b.png" 
+              alt="Cargo Claro" 
+              className="h-8"
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/120x30?text=Cargo+Claro';
+              }}
+            />
+          </div>
         )}
-        <h1 className="text-xl font-medium">{title}</h1>
       </div>
     </header>
   );
