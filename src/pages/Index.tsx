@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Card from '@/components/common/Card';
 import PageTransition from '@/components/layout/PageTransition';
-import { ClipboardList, FileText, FlaskConical } from 'lucide-react';
+import { ClipboardList, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProjectCardProps {
   title: string;
@@ -34,24 +34,19 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
 const Index = () => {
   const navigate = useNavigate();
+  
   const projects = [{
     id: 'new-previo',
-    title: 'Registro de nuevo Previo',
+    title: 'Nuevo Previo',
     icon: <FileText size={24} />,
     description: 'Registra un nuevo proceso de previo para importaciones',
     path: '/register-previo'
   }, {
     id: 'realizar-previo',
-    title: 'Realizar Previo',
+    title: 'Continuar Previo',
     icon: <ClipboardList size={24} />,
     description: 'Continuar con un proceso de previo existente',
     path: '/pedimento-selection'
-  }, {
-    id: 'test-productos',
-    title: 'Test - Productos',
-    icon: <FlaskConical size={24} />,
-    description: 'Prueba de registro y verificación de productos',
-    path: '/product-verification'
   }];
   
   // Check if there are saved products
@@ -79,7 +74,7 @@ const Index = () => {
                       ? 'Continuar con un proceso de previo guardado' 
                       : project.description
                   }
-                  onClick={() => navigate(project.path)} 
+                  onClick={() => navigate(project.path)}
                 />
               ))}
             </div>

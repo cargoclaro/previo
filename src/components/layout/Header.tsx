@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -38,8 +37,9 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
           )}
           <h1 className="text-xl font-medium">{title}</h1>
         </div>
-        {location.pathname === '/' && (
-          <div className="flex items-center">
+        
+        <div className="flex items-center">
+          {location.pathname === '/' && (
             <img 
               src="/lovable-uploads/5fb656fd-06e2-44f8-9b8b-343ebe591e4b.png" 
               alt="Cargo Claro" 
@@ -48,8 +48,8 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
                 e.currentTarget.src = 'https://via.placeholder.com/120x30?text=Cargo+Claro';
               }}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </header>
   );

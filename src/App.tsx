@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,8 @@ import GoodsCondition from "./pages/GoodsCondition";
 import ProductVerification from "./pages/ProductVerification";
 import NotFound from "./pages/NotFound";
 import RegisterPrevio from "./pages/RegisterPrevio";
+import EmbalajePrevio from "./pages/EmbalajePrevio";
+import PrevioComplete from "./pages/PrevioComplete";
 
 const queryClient = new QueryClient();
 
@@ -25,8 +26,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/pedimento-selection" element={<PedimentoSelection />} />
             <Route path="/register-previo" element={<RegisterPrevio />} />
-            <Route path="/goods-condition" element={<GoodsCondition />} />
+            <Route path="/embalaje-previo" element={<EmbalajePrevio />} />
             <Route path="/product-verification" element={<ProductVerification />} />
+            <Route path="/previo-complete" element={<PrevioComplete />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>

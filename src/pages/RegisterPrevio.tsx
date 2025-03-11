@@ -1,91 +1,157 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
+import PageTransition from '@/components/layout/PageTransition';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
-import PageTransition from '@/components/layout/PageTransition';
-import { ChevronRight, Clipboard } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
+interface ClientData {
+  client: string;
+  date: string;
+  entry: string;
+  supplier: string;
+  purchaseOrder: string;
+  trackingNumber: string;
+}
 
 const RegisterPrevio = () => {
   const navigate = useNavigate();
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate('/goods-condition');
+  const [clientData, setClientData] = useState<ClientData>({
+    client: '',
+    date: new Date().toISOString().split('T')[0],
+    entry: '',
+    supplier: '',
+    purchaseOrder: '',
+    trackingNumber: ''
+  });
+
+  const updateField = (field: keyof ClientData, value: string) => {
+    setClientData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Basic validation
+    const requiredFields = ['client', 'supplier', 'entry'] as const;
+    const missingFields = requiredFields.filter(field => !clientData[field]);
+    
+    if (missingFields.length > 0) {
+      toast.error(`Por favor complete los siguientes campos: ${missingFields.join(', ')}`);
+      return;
+    }
+    
+    // Save the client data to localStorage
+    localStorage.setItem('previoHeader', JSON.stringify({
+      ...clientData,
+      // Initialize packaging fields that will be filled in next step
+      packages: 0,
+      packageType: '',
+      carrier: '',
+      totalWeight: 0,
+      location: ''
+    }));
+    
+    // Navigate to embalaje step
+    navigate('/embalaje-previo');
   };
 
   return (
     <PageTransition>
       <div className="flex flex-col min-h-screen">
-        <Header title="Registro de Nuevo Previo" showBackButton />
+        <Header title="Nuevo Previo - Datos del Cliente" showBackButton />
         
-        <main className="flex-1 px-4 py-6">
-          <div className="container max-w-md mx-auto space-y-6 animate-slide-up">
-            <Card>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <h2 className="text-xl font-medium flex items-center gap-2">
-                    <Clipboard size={20} className="text-primary" />
-                    Información del Previo
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Ingresa la información necesaria para registrar un nuevo previo
-                  </p>
-                </div>
+        <main className="flex-1 px-4 py-6 pb-32">
+          <div className="container max-w-3xl mx-auto space-y-6">
+            <Card className="p-6 space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Cliente
+                  <span className="text-destructive ml-1">*</span>
+                </label>
+                <Input
+                  value={clientData.client}
+                  onChange={(e) => updateField('client', e.target.value)}
+                  placeholder="Nombre del cliente"
+                />
+              </div>
 
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="pedimento">Número de Pedimento</Label>
-                    <Input 
-                      id="pedimento" 
-                      placeholder="Ej. 21 43 3821 1234567" 
-                      required
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Fecha
+                </label>
+                <Input
+                  type="date"
+                  value={clientData.date}
+                  onChange={(e) => updateField('date', e.target.value)}
+                />
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="client">Cliente</Label>
-                    <Input 
-                      id="client" 
-                      placeholder="Nombre del cliente" 
-                      required
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Número de Entrada
+                  <span className="text-destructive ml-1">*</span>
+                </label>
+                <Input
+                  value={clientData.entry}
+                  onChange={(e) => updateField('entry', e.target.value)}
+                  placeholder="Número de entrada"
+                />
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="date">Fecha</Label>
-                    <Input 
-                      id="date" 
-                      type="date" 
-                      required
-                      defaultValue={new Date().toISOString().substr(0, 10)}
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Proveedor
+                  <span className="text-destructive ml-1">*</span>
+                </label>
+                <Input
+                  value={clientData.supplier}
+                  onChange={(e) => updateField('supplier', e.target.value)}
+                  placeholder="Nombre del proveedor"
+                />
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="notes">Notas Adicionales</Label>
-                    <textarea 
-                      id="notes" 
-                      placeholder="Información adicional..."
-                      className="w-full min-h-[100px] px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    />
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Orden de Compra
+                </label>
+                <Input
+                  value={clientData.purchaseOrder}
+                  onChange={(e) => updateField('purchaseOrder', e.target.value)}
+                  placeholder="Número de orden de compra"
+                />
+              </div>
 
-                <Button 
-                  className="w-full mt-4" 
-                  type="submit"
-                  icon={<ChevronRight size={18} />}
-                >
-                  Continuar al Previo
-                </Button>
-              </form>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Número de Guía
+                </label>
+                <Input
+                  value={clientData.trackingNumber}
+                  onChange={(e) => updateField('trackingNumber', e.target.value)}
+                  placeholder="Número de guía"
+                />
+              </div>
             </Card>
           </div>
         </main>
+        
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
+          <div className="container max-w-3xl mx-auto p-4">
+            <Button
+              onClick={handleSubmit}
+              className="w-full h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              <ChevronRight className="w-5 h-5 mr-2" />
+              Continuar a Embalaje
+            </Button>
+          </div>
+        </div>
       </div>
     </PageTransition>
   );

@@ -1,24 +1,28 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
+import PrevioHeader from '@/components/PrevioHeader';
 import Card from '@/components/common/Card';
 import ToggleSwitch from '@/components/common/ToggleSwitch';
 import PhotoCapture from '@/components/common/PhotoCapture';
 import Button from '@/components/common/Button';
-import { ChevronRight, Plus, Trash, Check, Save, ArrowLeft } from 'lucide-react';
+import { ChevronRight, Plus, Trash, Check, Save, ArrowLeft, Camera, Package2, FileText, Scan, Tag, FileDown, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
+import { generatePrevioPDF, generatePrevioDataURL } from '@/utils/pdfGenerator';
 
 // Define the Product type
 interface Product {
   id: string;
+  code: string;                    // CODIGO/LOTE
+  detailedDescription: string;     // DESCRIPCION DETALLADA
+  quantity: number;                // CANTIDAD
+  unitOfMeasure: string;          // U/M
+  weight: number;                  // PESO
+  origin: string;                  // ORIGEN
   matchesInvoice: boolean;
   discrepancy: string;
-  selectedProduct: string;
-  selectedOrigin: string;
-  productDescription: string;
   productPhoto: string | null;
   hasLabel: boolean;
   labelPhoto: string | null;
@@ -29,17 +33,35 @@ interface Product {
   modelNumber: string;
 }
 
+// Add header interface
+interface PrevioHeaderData {
+  client: string;
+  date: string;
+  entry: string;
+  supplier: string;
+  packages: number;
+  packageType: string;
+  carrier: string;
+  totalWeight: number;
+  location: string;
+  purchaseOrder: string;
+  trackingNumber: string;
+}
+
 const ProductVerification = () => {
   const navigate = useNavigate();
   
   // State for managing multiple products
   const [products, setProducts] = useState<Product[]>([{
     id: `product-${Date.now()}`,
+    code: '',
+    detailedDescription: '',
+    quantity: 0,
+    unitOfMeasure: '',
+    weight: 0,
+    origin: '',
     matchesInvoice: true,
     discrepancy: '',
-    selectedProduct: '',
-    selectedOrigin: '',
-    productDescription: '',
     productPhoto: null,
     hasLabel: false,
     labelPhoto: null,
@@ -64,22 +86,59 @@ const ProductVerification = () => {
 
   // Mock origin options
   const originOptions = [
-    { value: 'china', label: 'China' },
-    { value: 'usa', label: 'Estados Unidos' },
-    { value: 'mexico', label: 'México' },
-    { value: 'europa', label: 'Europa' },
-    { value: 'japon', label: 'Japón' },
+    { value: 'USA', label: 'USA' },
+    { value: 'Germany', label: 'Germany' },
+    { value: 'Mexico', label: 'México' },
+    { value: 'China', label: 'China' },
+    { value: 'Other', label: 'Otro' },
   ];
+
+  // Load header data from localStorage
+  const [headerData, setHeaderData] = useState<PrevioHeaderData>(() => {
+    const savedHeader = localStorage.getItem('previoHeader');
+    if (savedHeader) {
+      return JSON.parse(savedHeader);
+    }
+    return {
+      client: '',
+      date: new Date().toISOString().split('T')[0],
+      entry: '',
+      supplier: '',
+      packages: 0,
+      packageType: '',
+      carrier: '',
+      totalWeight: 0,
+      location: '',
+      purchaseOrder: '',
+      trackingNumber: ''
+    };
+  });
+
+  // Update header field function
+  const updateHeaderField = (field: string, value: string | number) => {
+    setHeaderData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    // Update localStorage
+    localStorage.setItem('previoHeader', JSON.stringify({
+      ...headerData,
+      [field]: value
+    }));
+  };
 
   // Add a new product
   const addProduct = () => {
     const newProduct: Product = {
       id: `product-${Date.now()}`,
+      code: '',
+      detailedDescription: '',
+      quantity: 0,
+      unitOfMeasure: '',
+      weight: 0,
+      origin: '',
       matchesInvoice: true,
       discrepancy: '',
-      selectedProduct: '',
-      selectedOrigin: '',
-      productDescription: '',
       productPhoto: null,
       hasLabel: false,
       labelPhoto: null,
@@ -129,44 +188,62 @@ const ProductVerification = () => {
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
       
-      if (!product.selectedProduct) {
-        toast.error(`Producto ${i + 1}: Selecciona un tipo de producto`);
+      if (!product.code) {
+        toast.error(`Producto ${i + 1}: Ingrese el código o lote`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.selectedOrigin) {
-        toast.error(`Producto ${i + 1}: Selecciona un origen`);
+      if (!product.detailedDescription) {
+        toast.error(`Producto ${i + 1}: Ingrese la descripción detallada`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.productDescription) {
-        toast.error(`Producto ${i + 1}: Ingresa descripción del producto`);
+      if (!product.quantity) {
+        toast.error(`Producto ${i + 1}: Ingrese la cantidad`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (!product.unitOfMeasure) {
+        toast.error(`Producto ${i + 1}: Seleccione la unidad de medida`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (!product.weight) {
+        toast.error(`Producto ${i + 1}: Ingrese el peso`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (!product.origin) {
+        toast.error(`Producto ${i + 1}: Seleccione el origen`);
         setCurrentProductIndex(i);
         return false;
       }
       
       if (!product.productPhoto) {
-        toast.error(`Producto ${i + 1}: Captura foto del producto`);
+        toast.error(`Producto ${i + 1}: Capture foto del producto`);
         setCurrentProductIndex(i);
         return false;
       }
       
       if (product.hasLabel && !product.labelPhoto) {
-        toast.error(`Producto ${i + 1}: Captura foto del etiquetado`);
+        toast.error(`Producto ${i + 1}: Capture foto del etiquetado`);
         setCurrentProductIndex(i);
         return false;
       }
       
       if (product.hasSerialNumber && (!product.serialNumber || !product.serialPhoto)) {
-        toast.error(`Producto ${i + 1}: Ingresa y captura el número de serie`);
+        toast.error(`Producto ${i + 1}: Ingrese y capture el número de serie`);
         setCurrentProductIndex(i);
         return false;
       }
       
       if (product.hasModel && !product.modelNumber) {
-        toast.error(`Producto ${i + 1}: Ingresa el número de modelo`);
+        toast.error(`Producto ${i + 1}: Ingrese el número de modelo`);
         setCurrentProductIndex(i);
         return false;
       }
@@ -177,37 +254,153 @@ const ProductVerification = () => {
 
   // Handle saving the work for later
   const handleSaveForLater = () => {
-    // In a real application, we would save this to a database or local storage
-    // For this demo, we'll just show a toast and navigate back to home
     localStorage.setItem('savedProducts', JSON.stringify(products));
     toast.success('Verificación guardada para continuar más tarde');
     navigate('/');
   };
 
-  // Handle final submission
+  const [pdfDataUrl, setPdfDataUrl] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const handlePreviewPDF = () => {
+    if (!validateProducts()) return;
+    
+    try {
+      const dataUrl = generatePrevioDataURL(headerData, products);
+      setPdfDataUrl(dataUrl);
+      setShowPreview(true);
+      toast.success('Vista previa del PDF generada');
+    } catch (error) {
+      console.error('Error generating PDF preview:', error);
+      toast.error('Error al generar la vista previa del PDF');
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    if (!validateProducts()) return;
+    
+    try {
+      generatePrevioPDF(headerData, products, `previo_${headerData.entry || 'nuevo'}.pdf`);
+      toast.success('PDF descargado correctamente');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Error al generar el PDF');
+    }
+  };
+
   const handleSubmit = () => {
-    if (validateProducts()) {
-      // In a real app, we would submit this data to a server
-      localStorage.setItem('completedVerification', JSON.stringify(products));
-      toast.success('Verificación de productos completada correctamente');
-      navigate('/');
+    if (!validateProducts()) return;
+    
+    try {
+      // Save products to localStorage
+      localStorage.setItem('previoProducts', JSON.stringify(products));
+      
+      // Navigate to the completion page
+      navigate('/previo-complete');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Error al procesar los datos');
     }
   };
 
   // Get current product being edited
   const currentProduct = products[currentProductIndex];
 
+  // Add these constants for unit of measure options
+  const unitOptions = [
+    { value: 'sacos', label: 'Sacos' },
+    { value: 'cajas', label: 'Cajas' },
+    { value: 'piezas', label: 'Piezas' },
+    { value: 'pallets', label: 'Pallets' },
+  ];
+
+  if (showPreview && pdfDataUrl) {
+    return (
+      <PageTransition>
+        <div className="flex flex-col min-h-screen">
+          <Header title="Vista Previa de Previo" showBackButton />
+          
+          <main className="flex-1 px-4 py-6 pb-32">
+            <div className="container max-w-3xl mx-auto space-y-6">
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Resumen del Previo</h2>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium">Cliente:</p>
+                    <p className="text-gray-600">{headerData.client}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Entrada:</p>
+                    <p className="text-gray-600">{headerData.entry}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Productos:</p>
+                    <p className="text-gray-600">{products.length}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Peso Total:</p>
+                    <p className="text-gray-600">{headerData.totalWeight} lbs</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Vista Previa del Documento</h2>
+                <div className="aspect-[3/4] w-full bg-gray-50 border rounded-lg overflow-hidden">
+                  <iframe
+                    src={pdfDataUrl}
+                    className="w-full h-full border-0"
+                    title="Vista previa del previo"
+                  />
+                </div>
+              </Card>
+            </div>
+          </main>
+          
+          <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
+            <div className="container max-w-3xl mx-auto p-4 flex gap-2">
+              <Button
+                onClick={() => setShowPreview(false)}
+                className="h-14 text-base font-medium bg-gray-200 hover:bg-gray-300 text-gray-800 flex-1"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Volver
+              </Button>
+              <Button
+                onClick={handleDownloadPDF}
+                className="h-14 text-base font-medium bg-gray-200 hover:bg-gray-300 text-gray-800 flex-1"
+              >
+                <FileDown className="w-5 h-5 mr-2" />
+                Descargar PDF
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                className="h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white flex-1"
+              >
+                <ChevronRight className="w-5 h-5 mr-2" />
+                Continuar
+              </Button>
+            </div>
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
+
   return (
     <PageTransition>
       <div className="flex flex-col min-h-screen">
         <Header title="Verificación de Productos" showBackButton />
         
-        <main className="flex-1 px-4 py-6 pb-20">
-          <div className="container max-w-md mx-auto space-y-6 animate-slide-up">
+        <main className="flex-1 px-4 py-6 pb-32">
+          <div className="container max-w-3xl mx-auto space-y-6 animate-slide-up">
             {/* Product Navigation */}
             <Card>
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Productos ({products.length})</h3>
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <Package2 className="w-5 h-5 text-orange-500" />
+                  Productos ({products.length})
+                </h3>
                 
                 <div className="flex flex-wrap gap-2">
                   {products.map((product, index) => (
@@ -248,9 +441,88 @@ const ProductVerification = () => {
             </Card>
             
             {/* Current Product Form */}
-            <div className="space-y-4">
-              <Card className="space-y-4">
-                <h3 className="text-lg font-medium">Producto {currentProductIndex + 1}</h3>
+            <Card>
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-orange-500" />
+                  Detalles del Producto {currentProductIndex + 1}
+                </h3>
+                
+                {/* Code/Lot Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Código/Lote</label>
+                  <Input
+                    value={currentProduct.code}
+                    onChange={(e) => updateProductField('code', e.target.value)}
+                    placeholder="Ingrese el código o lote"
+                  />
+                </div>
+                
+                {/* Detailed Description Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Descripción Detallada</label>
+                  <Input
+                    value={currentProduct.detailedDescription}
+                    onChange={(e) => updateProductField('detailedDescription', e.target.value)}
+                    placeholder="Ingrese la descripción del producto"
+                  />
+                </div>
+                
+                {/* Quantity Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Cantidad</label>
+                  <Input
+                    type="number"
+                    value={currentProduct.quantity}
+                    onChange={(e) => updateProductField('quantity', parseInt(e.target.value) || 0)}
+                    placeholder="Ingrese la cantidad"
+                  />
+                </div>
+                
+                {/* Unit of Measure Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Unidad de Medida</label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-md"
+                    value={currentProduct.unitOfMeasure}
+                    onChange={(e) => updateProductField('unitOfMeasure', e.target.value)}
+                  >
+                    <option value="">Seleccione unidad</option>
+                    {unitOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Weight Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Peso (lbs)</label>
+                  <Input
+                    type="number"
+                    value={currentProduct.weight}
+                    onChange={(e) => updateProductField('weight', parseFloat(e.target.value) || 0)}
+                    placeholder="Ingrese el peso en libras"
+                  />
+                </div>
+                
+                {/* Origin Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Origen</label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-md"
+                    value={currentProduct.origin}
+                    onChange={(e) => updateProductField('origin', e.target.value)}
+                  >
+                    <option value="">Seleccione origen</option>
+                    {originOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 
                 <ToggleSwitch
                   label="¿El producto coincide con la información en factura?"
@@ -272,156 +544,112 @@ const ProductVerification = () => {
                     ></textarea>
                   </div>
                 )}
-                
-                <div className="space-y-4 pt-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Producto<span className="text-destructive ml-1">*</span>
-                    </label>
-                    <select
-                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={currentProduct.selectedProduct}
-                      onChange={(e) => updateProductField('selectedProduct', e.target.value)}
-                    >
-                      <option value="">Seleccionar producto</option>
-                      {productOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Origen<span className="text-destructive ml-1">*</span>
-                    </label>
-                    <select
-                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={currentProduct.selectedOrigin}
-                      onChange={(e) => updateProductField('selectedOrigin', e.target.value)}
-                    >
-                      <option value="">Seleccionar origen</option>
-                      {originOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Descripción del producto<span className="text-destructive ml-1">*</span>
-                    </label>
-                    <textarea
-                      className="w-full h-24 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={currentProduct.productDescription}
-                      onChange={(e) => updateProductField('productDescription', e.target.value)}
-                      placeholder="Describe el producto detalladamente..."
-                    ></textarea>
-                  </div>
-                </div>
-              </Card>
+              </div>
+            </Card>
+            
+            <Card className="space-y-4">
+              <h3 className="text-lg font-medium flex items-center gap-2">
+                <Camera className="w-5 h-5 text-orange-500" />
+                Documentación Fotográfica
+              </h3>
               
-              <Card className="space-y-4">
-                <h3 className="text-lg font-medium">Documentación Fotográfica</h3>
-                
-                <PhotoCapture
-                  label="Capturar Foto de Producto"
-                  onPhotoCapture={(photo) => updateProductField('productPhoto', photo)}
-                  required
-                />
-                
-                <ToggleSwitch
-                  label="¿Producto Cuenta con Etiquetado?"
-                  checked={currentProduct.hasLabel}
-                  onChange={(value) => updateProductField('hasLabel', value)}
-                />
-                
-                {currentProduct.hasLabel && (
-                  <div className="pl-4 border-l-2 border-primary/20">
-                    <PhotoCapture
-                      label="Captura foto de Etiquetado"
-                      onPhotoCapture={(photo) => updateProductField('labelPhoto', photo)}
-                      required
-                    />
+              <PhotoCapture
+                label="Capturar Foto de Producto"
+                onPhotoCapture={(photo) => updateProductField('productPhoto', photo)}
+                required
+              />
+              
+              <ToggleSwitch
+                label={
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-orange-500" />
+                    ¿Producto Cuenta con Etiquetado?
                   </div>
-                )}
-                
-                <ToggleSwitch
-                  label="¿Producto Tiene Número de Serie?"
-                  checked={currentProduct.hasSerialNumber}
-                  onChange={(value) => updateProductField('hasSerialNumber', value)}
-                />
-                
-                {currentProduct.hasSerialNumber && (
-                  <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Ingresar número de serie
-                        <span className="text-destructive ml-1">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={currentProduct.serialNumber}
-                        onChange={(e) => updateProductField('serialNumber', e.target.value)}
-                        placeholder="Ej. SN12345678"
-                      />
-                    </div>
-                    
-                    <PhotoCapture
-                      label="Capturar Número de Serie"
-                      onPhotoCapture={(photo) => updateProductField('serialPhoto', photo)}
-                      required
-                    />
+                }
+                checked={currentProduct.hasLabel}
+                onChange={(value) => updateProductField('hasLabel', value)}
+              />
+              
+              {currentProduct.hasLabel && (
+                <div className="pl-4 border-l-2 border-primary/20">
+                  <PhotoCapture
+                    label="Captura foto de Etiquetado"
+                    onPhotoCapture={(photo) => updateProductField('labelPhoto', photo)}
+                    required
+                  />
+                </div>
+              )}
+              
+              <ToggleSwitch
+                label={
+                  <div className="flex items-center gap-2">
+                    <Scan className="w-4 h-4 text-orange-500" />
+                    ¿Producto Tiene Número de Serie?
                   </div>
-                )}
-                
-                <ToggleSwitch
-                  label="¿Producto Tiene Modelo?"
-                  checked={currentProduct.hasModel}
-                  onChange={(value) => updateProductField('hasModel', value)}
-                />
-                
-                {currentProduct.hasModel && (
-                  <div className="pl-4 border-l-2 border-primary/20 space-y-2">
+                }
+                checked={currentProduct.hasSerialNumber}
+                onChange={(value) => updateProductField('hasSerialNumber', value)}
+              />
+              
+              {currentProduct.hasSerialNumber && (
+                <div className="pl-4 border-l-2 border-primary/20 space-y-4">
+                  <div className="space-y-2">
                     <label className="text-sm font-medium">
-                      Ingresar modelo
+                      Ingresar número de serie
                       <span className="text-destructive ml-1">*</span>
                     </label>
                     <Input
                       type="text"
-                      value={currentProduct.modelNumber}
-                      onChange={(e) => updateProductField('modelNumber', e.target.value)}
-                      placeholder="Ej. MD-2023-X"
+                      value={currentProduct.serialNumber}
+                      onChange={(e) => updateProductField('serialNumber', e.target.value)}
+                      placeholder="Ej. SN12345678"
                     />
                   </div>
-                )}
-              </Card>
-            </div>
+                  
+                  <PhotoCapture
+                    label="Capturar Número de Serie"
+                    onPhotoCapture={(photo) => updateProductField('serialPhoto', photo)}
+                    required
+                  />
+                </div>
+              )}
+              
+              <ToggleSwitch
+                label="¿Producto Tiene Modelo?"
+                checked={currentProduct.hasModel}
+                onChange={(value) => updateProductField('hasModel', value)}
+              />
+              
+              {currentProduct.hasModel && (
+                <div className="pl-4 border-l-2 border-primary/20 space-y-2">
+                  <label className="text-sm font-medium">
+                    Ingresar modelo
+                    <span className="text-destructive ml-1">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    value={currentProduct.modelNumber}
+                    onChange={(e) => updateProductField('modelNumber', e.target.value)}
+                    placeholder="Ej. MD-2023-X"
+                  />
+                </div>
+              )}
+            </Card>
           </div>
         </main>
         
-        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border">
-          <div className="container max-w-md mx-auto flex justify-between gap-3">
+        {/* Updated Action Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
+          <div className="container max-w-3xl mx-auto p-4">
             <Button
-              variant="outline"
-              className="flex-1"
-              onClick={handleSaveForLater}
-              icon={<Save size={18} />}
-            >
-              Guardar y Salir
-            </Button>
-            <Button
-              className="flex-1"
               onClick={handleSubmit}
-              icon={<Check size={18} />}
+              className="w-full h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white"
             >
-              Finalizar
+              <ChevronRight className="w-5 h-5 mr-2" />
+              Finalizar y Ver Documento
             </Button>
           </div>
-        </footer>
+        </div>
       </div>
     </PageTransition>
   );
