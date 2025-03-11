@@ -7,29 +7,51 @@ import Card from '@/components/common/Card';
 import ToggleSwitch from '@/components/common/ToggleSwitch';
 import PhotoCapture from '@/components/common/PhotoCapture';
 import Button from '@/components/common/Button';
-import { ChevronRight, Camera, AlertCircle, Check } from 'lucide-react';
+import { ChevronRight, Plus, Trash, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+
+// Define the Product type
+interface Product {
+  id: string;
+  matchesInvoice: boolean;
+  discrepancy: string;
+  selectedProduct: string;
+  selectedOrigin: string;
+  productDescription: string;
+  productPhoto: string | null;
+  hasLabel: boolean;
+  labelPhoto: string | null;
+  hasSerialNumber: boolean;
+  serialNumber: string;
+  serialPhoto: string | null;
+  hasModel: boolean;
+  modelNumber: string;
+}
 
 const ProductVerification = () => {
   const navigate = useNavigate();
   
-  const [matchesInvoice, setMatchesInvoice] = useState(true);
-  const [discrepancy, setDiscrepancy] = useState('');
+  // State for managing multiple products
+  const [products, setProducts] = useState<Product[]>([{
+    id: `product-${Date.now()}`,
+    matchesInvoice: true,
+    discrepancy: '',
+    selectedProduct: '',
+    selectedOrigin: '',
+    productDescription: '',
+    productPhoto: null,
+    hasLabel: false,
+    labelPhoto: null,
+    hasSerialNumber: false,
+    serialNumber: '',
+    serialPhoto: null,
+    hasModel: false,
+    modelNumber: ''
+  }]);
   
-  const [selectedProduct, setSelectedProduct] = useState('');
-  const [selectedOrigin, setSelectedOrigin] = useState('');
-  const [productDescription, setProductDescription] = useState('');
-  
-  const [productPhoto, setProductPhoto] = useState<string | null>(null);
-  const [hasLabel, setHasLabel] = useState(false);
-  const [labelPhoto, setLabelPhoto] = useState<string | null>(null);
-  
-  const [hasSerialNumber, setHasSerialNumber] = useState(false);
-  const [serialNumber, setSerialNumber] = useState('');
-  const [serialPhoto, setSerialPhoto] = useState<string | null>(null);
-  
-  const [hasModel, setHasModel] = useState(false);
-  const [modelNumber, setModelNumber] = useState('');
+  // Current product being edited
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
 
   // Mock product options
   const productOptions = [
@@ -49,51 +71,183 @@ const ProductVerification = () => {
     { value: 'japon', label: 'Japón' },
   ];
 
-  const handleSubmit = () => {
-    // Validate required fields
-    if (!productPhoto) {
-      toast.error('Debes capturar una foto del producto');
-      return;
-    }
-
-    if (hasLabel && !labelPhoto) {
-      toast.error('Debes capturar una foto del etiquetado');
-      return;
-    }
-
-    if (hasSerialNumber && (!serialNumber || !serialPhoto)) {
-      toast.error('Debes ingresar y capturar el número de serie');
-      return;
-    }
-
-    if (hasModel && !modelNumber) {
-      toast.error('Debes ingresar el número de modelo');
-      return;
-    }
-
-    // If everything is valid, show success message and navigate
-    toast.success('Verificación de producto completada correctamente');
-    navigate('/');
+  // Add a new product
+  const addProduct = () => {
+    const newProduct: Product = {
+      id: `product-${Date.now()}`,
+      matchesInvoice: true,
+      discrepancy: '',
+      selectedProduct: '',
+      selectedOrigin: '',
+      productDescription: '',
+      productPhoto: null,
+      hasLabel: false,
+      labelPhoto: null,
+      hasSerialNumber: false,
+      serialNumber: '',
+      serialPhoto: null,
+      hasModel: false,
+      modelNumber: ''
+    };
+    
+    setProducts([...products, newProduct]);
+    setCurrentProductIndex(products.length);
+    toast.success('Producto añadido');
   };
+
+  // Remove a product
+  const removeProduct = (index: number) => {
+    if (products.length <= 1) {
+      toast.error('Debe haber al menos un producto');
+      return;
+    }
+    
+    const newProducts = [...products];
+    newProducts.splice(index, 1);
+    setProducts(newProducts);
+    
+    // Adjust current index if necessary
+    if (currentProductIndex >= newProducts.length) {
+      setCurrentProductIndex(newProducts.length - 1);
+    }
+    
+    toast.success('Producto eliminado');
+  };
+
+  // Update a specific product field
+  const updateProductField = (field: keyof Product, value: any) => {
+    const updatedProducts = [...products];
+    updatedProducts[currentProductIndex] = {
+      ...updatedProducts[currentProductIndex],
+      [field]: value
+    };
+    setProducts(updatedProducts);
+  };
+
+  // Validate all products before submission
+  const validateProducts = () => {
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+      
+      if (!product.selectedProduct) {
+        toast.error(`Producto ${i + 1}: Selecciona un tipo de producto`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (!product.selectedOrigin) {
+        toast.error(`Producto ${i + 1}: Selecciona un origen`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (!product.productDescription) {
+        toast.error(`Producto ${i + 1}: Ingresa descripción del producto`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (!product.productPhoto) {
+        toast.error(`Producto ${i + 1}: Captura foto del producto`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (product.hasLabel && !product.labelPhoto) {
+        toast.error(`Producto ${i + 1}: Captura foto del etiquetado`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (product.hasSerialNumber && (!product.serialNumber || !product.serialPhoto)) {
+        toast.error(`Producto ${i + 1}: Ingresa y captura el número de serie`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+      
+      if (product.hasModel && !product.modelNumber) {
+        toast.error(`Producto ${i + 1}: Ingresa el número de modelo`);
+        setCurrentProductIndex(i);
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  // Handle final submission
+  const handleSubmit = () => {
+    if (validateProducts()) {
+      toast.success('Verificación de productos completada correctamente');
+      navigate('/');
+    }
+  };
+
+  // Get current product being edited
+  const currentProduct = products[currentProductIndex];
 
   return (
     <PageTransition>
       <div className="flex flex-col min-h-screen">
-        <Header title="Verificación de Producto" showBackButton />
+        <Header title="Verificación de Productos" showBackButton />
         
         <main className="flex-1 px-4 py-6 pb-20">
           <div className="container max-w-md mx-auto space-y-6 animate-slide-up">
+            {/* Product Navigation */}
+            <Card>
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Productos ({products.length})</h3>
+                
+                <div className="flex flex-wrap gap-2">
+                  {products.map((product, index) => (
+                    <button
+                      key={product.id}
+                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors 
+                        ${index === currentProductIndex 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                        }
+                        ${product.productPhoto ? 'ring-2 ring-green-500/20' : ''}`}
+                      onClick={() => setCurrentProductIndex(index)}
+                    >
+                      Producto {index + 1}
+                      {product.productPhoto && <span className="ml-1 text-xs">✓</span>}
+                    </button>
+                  ))}
+                  
+                  <button
+                    className="px-3 py-1 rounded-full text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center gap-1"
+                    onClick={addProduct}
+                  >
+                    <Plus size={14} />
+                    Añadir
+                  </button>
+                </div>
+                
+                {products.length > 1 && (
+                  <button
+                    className="text-destructive text-sm flex items-center gap-1 hover:underline"
+                    onClick={() => removeProduct(currentProductIndex)}
+                  >
+                    <Trash size={14} />
+                    Eliminar producto actual
+                  </button>
+                )}
+              </div>
+            </Card>
+            
+            {/* Current Product Form */}
             <div className="space-y-4">
               <Card className="space-y-4">
-                <h3 className="text-lg font-medium">Información del Producto</h3>
+                <h3 className="text-lg font-medium">Producto {currentProductIndex + 1}</h3>
                 
                 <ToggleSwitch
                   label="¿El producto coincide con la información en factura?"
-                  checked={matchesInvoice}
-                  onChange={setMatchesInvoice}
+                  checked={currentProduct.matchesInvoice}
+                  onChange={(value) => updateProductField('matchesInvoice', value)}
                 />
                 
-                {!matchesInvoice && (
+                {!currentProduct.matchesInvoice && (
                   <div className="pl-4 border-l-2 border-destructive/20 space-y-2">
                     <label className="text-sm font-medium">
                       Registra la discrepancia
@@ -101,8 +255,8 @@ const ProductVerification = () => {
                     </label>
                     <textarea
                       className="w-full h-24 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={discrepancy}
-                      onChange={(e) => setDiscrepancy(e.target.value)}
+                      value={currentProduct.discrepancy}
+                      onChange={(e) => updateProductField('discrepancy', e.target.value)}
                       placeholder="Describe la diferencia encontrada respecto a la factura..."
                     ></textarea>
                   </div>
@@ -115,8 +269,8 @@ const ProductVerification = () => {
                     </label>
                     <select
                       className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={selectedProduct}
-                      onChange={(e) => setSelectedProduct(e.target.value)}
+                      value={currentProduct.selectedProduct}
+                      onChange={(e) => updateProductField('selectedProduct', e.target.value)}
                     >
                       <option value="">Seleccionar producto</option>
                       {productOptions.map((option) => (
@@ -133,8 +287,8 @@ const ProductVerification = () => {
                     </label>
                     <select
                       className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={selectedOrigin}
-                      onChange={(e) => setSelectedOrigin(e.target.value)}
+                      value={currentProduct.selectedOrigin}
+                      onChange={(e) => updateProductField('selectedOrigin', e.target.value)}
                     >
                       <option value="">Seleccionar origen</option>
                       {originOptions.map((option) => (
@@ -151,8 +305,8 @@ const ProductVerification = () => {
                     </label>
                     <textarea
                       className="w-full h-24 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={productDescription}
-                      onChange={(e) => setProductDescription(e.target.value)}
+                      value={currentProduct.productDescription}
+                      onChange={(e) => updateProductField('productDescription', e.target.value)}
                       placeholder="Describe el producto detalladamente..."
                     ></textarea>
                   </div>
@@ -164,21 +318,21 @@ const ProductVerification = () => {
                 
                 <PhotoCapture
                   label="Capturar Foto de Producto"
-                  onPhotoCapture={(photo) => setProductPhoto(photo)}
+                  onPhotoCapture={(photo) => updateProductField('productPhoto', photo)}
                   required
                 />
                 
                 <ToggleSwitch
                   label="¿Producto Cuenta con Etiquetado?"
-                  checked={hasLabel}
-                  onChange={setHasLabel}
+                  checked={currentProduct.hasLabel}
+                  onChange={(value) => updateProductField('hasLabel', value)}
                 />
                 
-                {hasLabel && (
+                {currentProduct.hasLabel && (
                   <div className="pl-4 border-l-2 border-primary/20">
                     <PhotoCapture
                       label="Captura foto de Etiquetado"
-                      onPhotoCapture={(photo) => setLabelPhoto(photo)}
+                      onPhotoCapture={(photo) => updateProductField('labelPhoto', photo)}
                       required
                     />
                   </div>
@@ -186,29 +340,28 @@ const ProductVerification = () => {
                 
                 <ToggleSwitch
                   label="¿Producto Tiene Número de Serie?"
-                  checked={hasSerialNumber}
-                  onChange={setHasSerialNumber}
+                  checked={currentProduct.hasSerialNumber}
+                  onChange={(value) => updateProductField('hasSerialNumber', value)}
                 />
                 
-                {hasSerialNumber && (
+                {currentProduct.hasSerialNumber && (
                   <div className="pl-4 border-l-2 border-primary/20 space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
                         Ingresar número de serie
                         <span className="text-destructive ml-1">*</span>
                       </label>
-                      <input
+                      <Input
                         type="text"
-                        className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                        value={serialNumber}
-                        onChange={(e) => setSerialNumber(e.target.value)}
+                        value={currentProduct.serialNumber}
+                        onChange={(e) => updateProductField('serialNumber', e.target.value)}
                         placeholder="Ej. SN12345678"
                       />
                     </div>
                     
                     <PhotoCapture
                       label="Capturar Número de Serie"
-                      onPhotoCapture={(photo) => setSerialPhoto(photo)}
+                      onPhotoCapture={(photo) => updateProductField('serialPhoto', photo)}
                       required
                     />
                   </div>
@@ -216,21 +369,20 @@ const ProductVerification = () => {
                 
                 <ToggleSwitch
                   label="¿Producto Tiene Modelo?"
-                  checked={hasModel}
-                  onChange={setHasModel}
+                  checked={currentProduct.hasModel}
+                  onChange={(value) => updateProductField('hasModel', value)}
                 />
                 
-                {hasModel && (
+                {currentProduct.hasModel && (
                   <div className="pl-4 border-l-2 border-primary/20 space-y-2">
                     <label className="text-sm font-medium">
                       Ingresar modelo
                       <span className="text-destructive ml-1">*</span>
                     </label>
-                    <input
+                    <Input
                       type="text"
-                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={modelNumber}
-                      onChange={(e) => setModelNumber(e.target.value)}
+                      value={currentProduct.modelNumber}
+                      onChange={(e) => updateProductField('modelNumber', e.target.value)}
                       placeholder="Ej. MD-2023-X"
                     />
                   </div>
