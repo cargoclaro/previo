@@ -7,7 +7,7 @@ import Card from '@/components/common/Card';
 import ToggleSwitch from '@/components/common/ToggleSwitch';
 import PhotoCapture from '@/components/common/PhotoCapture';
 import Button from '@/components/common/Button';
-import { ChevronRight, Plus, Trash, Check } from 'lucide-react';
+import { ChevronRight, Plus, Trash, Check, Save, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 
@@ -175,9 +175,20 @@ const ProductVerification = () => {
     return true;
   };
 
+  // Handle saving the work for later
+  const handleSaveForLater = () => {
+    // In a real application, we would save this to a database or local storage
+    // For this demo, we'll just show a toast and navigate back to home
+    localStorage.setItem('savedProducts', JSON.stringify(products));
+    toast.success('Verificación guardada para continuar más tarde');
+    navigate('/');
+  };
+
   // Handle final submission
   const handleSubmit = () => {
     if (validateProducts()) {
+      // In a real app, we would submit this data to a server
+      localStorage.setItem('completedVerification', JSON.stringify(products));
       toast.success('Verificación de productos completada correctamente');
       navigate('/');
     }
@@ -393,13 +404,21 @@ const ProductVerification = () => {
         </main>
         
         <footer className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border">
-          <div className="container max-w-md mx-auto">
+          <div className="container max-w-md mx-auto flex justify-between gap-3">
             <Button
-              className="w-full"
+              variant="outline"
+              className="flex-1"
+              onClick={handleSaveForLater}
+              icon={<Save size={18} />}
+            >
+              Guardar y Salir
+            </Button>
+            <Button
+              className="flex-1"
               onClick={handleSubmit}
               icon={<Check size={18} />}
             >
-              Finalizar Verificación
+              Finalizar
             </Button>
           </div>
         </footer>
