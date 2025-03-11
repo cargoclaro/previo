@@ -10,6 +10,7 @@ import PedimentoSelection from "./pages/PedimentoSelection";
 import GoodsCondition from "./pages/GoodsCondition";
 import ProductVerification from "./pages/ProductVerification";
 import NotFound from "./pages/NotFound";
+import RegisterPrevio from "./pages/RegisterPrevio";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/pedimento-selection" element={<PedimentoSelection />} />
+            <Route path="/register-previo" element={<RegisterPrevio />} />
             <Route path="/goods-condition" element={<GoodsCondition />} />
             <Route path="/product-verification" element={<ProductVerification />} />
             <Route path="*" element={<NotFound />} />

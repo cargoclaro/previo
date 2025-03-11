@@ -41,7 +41,7 @@ const Index = () => {
       title: 'Registro de nuevo Previo',
       icon: <FileText size={24} />,
       description: 'Registra un nuevo proceso de previo para importaciones',
-      path: '/pedimento-selection'
+      path: '/register-previo'
     },
     {
       id: 'realizar-previo',
