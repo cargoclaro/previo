@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -81,27 +82,16 @@ const Index = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-cargo-light to-white">
         <Header title="Cargo Claro" />
         
-        <main className="flex-1 px-4 py-6 container max-w-md mx-auto">
+        <main className="flex-1 px-4 py-6 container max-w-md mx-auto flex flex-col">
           {user ? (
-            <section className="space-y-6 animate-slide-up">
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <h2 className="text-xl md:text-2xl font-medium tracking-tight text-gray-900">
-                    Dashboard de Previos
-                  </h2>
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    Selecciona una opción para comenzar
-                  </p>
-                </div>
-                
-                <button
-                  onClick={handleSignOut}
-                  className="p-2.5 text-gray-600 hover:bg-gray-100 active:bg-gray-200 rounded-full 
-                    transition-all duration-200 flex items-center gap-2 hover:text-gray-900"
-                  aria-label="Cerrar sesión"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
+            <section className="flex-1 flex flex-col space-y-6 animate-slide-up">
+              <div>
+                <h2 className="text-xl md:text-2xl font-medium tracking-tight text-gray-900">
+                  Dashboard de Previos
+                </h2>
+                <p className="text-sm md:text-base text-muted-foreground">
+                  Selecciona una opción para comenzar
+                </p>
               </div>
               
               <div className="grid gap-4">
@@ -114,6 +104,18 @@ const Index = () => {
                     onClick={() => navigate(project.path)}
                   />
                 ))}
+              </div>
+              
+              <div className="mt-auto pt-6">
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 
+                    text-gray-700 font-medium p-3 rounded-lg transition-all duration-200"
+                  aria-label="Cerrar sesión"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Cerrar Sesión</span>
+                </button>
               </div>
             </section>
           ) : (
