@@ -1,5 +1,8 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
 import Card from '@/components/common/Card';
@@ -19,6 +22,7 @@ interface ClientData {
 
 const RegisterPrevio = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const [clientData, setClientData] = useState<ClientData>({
     client: '',
@@ -28,6 +32,7 @@ const RegisterPrevio = () => {
     purchaseOrder: '',
     trackingNumber: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateField = (field: keyof ClientData, value: string) => {
     setClientData(prev => ({
@@ -36,7 +41,13 @@ const RegisterPrevio = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error('Debes iniciar sesión para crear un previo');
+      navigate('/auth');
+      return;
+    }
+    
     // Basic validation
     const requiredFields = ['client', 'supplier', 'entry'] as const;
     const missingFields = requiredFields.filter(field => !clientData[field]);
@@ -46,19 +57,65 @@ const RegisterPrevio = () => {
       return;
     }
     
-    // Save the client data to localStorage
-    localStorage.setItem('previoHeader', JSON.stringify({
-      ...clientData,
-      // Initialize packaging fields that will be filled in next step
-      packages: 0,
-      packageType: '',
-      carrier: '',
-      totalWeight: 0,
-      location: ''
-    }));
+    setIsSubmitting(true);
     
-    // Navigate to embalaje step
-    navigate('/embalaje-previo');
+    try {
+      // Get user profile to get organization_id
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (profileError) throw profileError;
+      
+      if (!profileData.organization_id) {
+        throw new Error('No se encontró la organización para este usuario');
+      }
+      
+      // Create a new previo
+      const { data: previoData, error: previoError } = await supabase
+        .from('previos')
+        .insert([
+          {
+            client: clientData.client,
+            date: clientData.date,
+            entry: clientData.entry,
+            supplier: clientData.supplier,
+            purchase_order: clientData.purchaseOrder,
+            tracking_number: clientData.trackingNumber,
+            status: 'in-progress',
+            organization_id: profileData.organization_id,
+            created_by: user.id
+          }
+        ])
+        .select()
+        .single();
+      
+      if (previoError) throw previoError;
+      
+      // Save to localStorage for compatibility with existing flow
+      localStorage.setItem('previoHeader', JSON.stringify({
+        ...clientData,
+        packages: 0,
+        packageType: '',
+        carrier: '',
+        totalWeight: 0,
+        location: '',
+        id: previoData.id // Add the ID for future reference
+      }));
+      
+      // Initialize empty products array
+      localStorage.setItem('previoProducts', JSON.stringify([]));
+      
+      toast.success('Previo creado correctamente');
+      navigate('/embalaje-previo');
+    } catch (error: any) {
+      console.error('Error creating previo:', error);
+      toast.error(error.message || 'Error al crear el previo');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -146,9 +203,14 @@ const RegisterPrevio = () => {
             <Button
               onClick={handleSubmit}
               className="w-full h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={isSubmitting}
             >
-              <ChevronRight className="w-5 h-5 mr-2" />
-              Continuar a Embalaje
+              {isSubmitting ? 'Creando...' : (
+                <>
+                  <ChevronRight className="w-5 h-5 mr-2" />
+                  Continuar a Embalaje
+                </>
+              )}
             </Button>
           </div>
         </div>

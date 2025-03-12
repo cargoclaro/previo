@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
 import Button from '@/components/common/Button';
@@ -9,6 +11,7 @@ import { toast } from 'sonner';
 import { generatePrevioPDF, generatePrevioDataURL } from '@/utils/pdfGenerator';
 
 interface PrevioHeaderData {
+  id?: string;
   client: string;
   date: string;
   entry: string;
@@ -24,9 +27,11 @@ interface PrevioHeaderData {
 
 const PrevioComplete = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [headerData, setHeaderData] = useState<PrevioHeaderData | null>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -44,6 +49,12 @@ const PrevioComplete = () => {
         const productsData = JSON.parse(savedProducts);
         setHeaderData(headerData);
         setProducts(productsData);
+        
+        // If coming from a new previo (not yet finalized), save it to Supabase
+        if (headerData.id && user) {
+          await savePrevioToSupabase(headerData, productsData);
+        }
+        
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -53,7 +64,122 @@ const PrevioComplete = () => {
     };
 
     loadData();
-  }, [navigate]);
+  }, [navigate, user]);
+
+  const savePrevioToSupabase = async (header: PrevioHeaderData, products: any[]) => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    try {
+      // Get user profile to get organization_id
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (profileError) throw profileError;
+      
+      const existingPrevioId = header.id;
+      
+      // Check if previo exists in Supabase
+      if (existingPrevioId) {
+        // Update the existing previo
+        const { error: updateError } = await supabase
+          .from('previos')
+          .update({
+            client: header.client,
+            date: header.date,
+            entry: header.entry,
+            supplier: header.supplier,
+            packages: header.packages,
+            package_type: header.packageType,
+            carrier: header.carrier,
+            total_weight: header.totalWeight,
+            location: header.location,
+            purchase_order: header.purchaseOrder,
+            tracking_number: header.trackingNumber,
+            status: 'completed'
+          })
+          .eq('id', existingPrevioId);
+        
+        if (updateError) throw updateError;
+        
+        // Delete existing products for this previo
+        const { error: deleteError } = await supabase
+          .from('products')
+          .delete()
+          .eq('previo_id', existingPrevioId);
+        
+        if (deleteError) throw deleteError;
+        
+        // Insert new products
+        for (const product of products) {
+          const { error: insertError } = await supabase
+            .from('products')
+            .insert({
+              previo_id: existingPrevioId,
+              name: product.detailedDescription || 'Producto sin descripción',
+              description: product.detailedDescription,
+              quantity: product.quantity,
+              weight: product.weight,
+              serial_number: product.serialNumber,
+              image_url: product.productPhoto
+            });
+          
+          if (insertError) throw insertError;
+        }
+      } else {
+        // Create new previo
+        const { data: newPrevio, error: insertPrevioError } = await supabase
+          .from('previos')
+          .insert({
+            client: header.client,
+            date: header.date,
+            entry: header.entry,
+            supplier: header.supplier,
+            packages: header.packages,
+            package_type: header.packageType,
+            carrier: header.carrier,
+            total_weight: header.totalWeight,
+            location: header.location,
+            purchase_order: header.purchaseOrder,
+            tracking_number: header.trackingNumber,
+            status: 'completed',
+            organization_id: profileData.organization_id,
+            created_by: user.id
+          })
+          .select()
+          .single();
+        
+        if (insertPrevioError) throw insertPrevioError;
+        
+        // Insert products
+        for (const product of products) {
+          const { error: insertError } = await supabase
+            .from('products')
+            .insert({
+              previo_id: newPrevio.id,
+              name: product.detailedDescription || 'Producto sin descripción',
+              description: product.detailedDescription,
+              quantity: product.quantity,
+              weight: product.weight,
+              serial_number: product.serialNumber,
+              image_url: product.productPhoto
+            });
+          
+          if (insertError) throw insertError;
+        }
+      }
+      
+      toast.success('Previo guardado correctamente');
+    } catch (error: any) {
+      console.error('Error saving previo to Supabase:', error);
+      toast.error('Error al guardar el previo: ' + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleDownload = () => {
     try {
@@ -72,14 +198,17 @@ const PrevioComplete = () => {
     navigate('/');
   };
 
-  if (isLoading) {
+  if (isLoading || isSaving) {
     return (
       <PageTransition>
         <div className="flex flex-col min-h-screen">
           <Header title="Procesando Previo" />
           <main className="flex-1 flex items-center justify-center">
             <div className="text-center space-y-4">
-              <div className="text-lg">Generando documento...</div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500 mx-auto"></div>
+              <div className="text-lg">
+                {isSaving ? 'Guardando previo...' : 'Generando documento...'}
+              </div>
               <div className="text-sm text-gray-500">Por favor espere</div>
             </div>
           </main>
