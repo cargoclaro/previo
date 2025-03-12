@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
   return (
     <header 
       className={cn(
-        "sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b py-3 px-4 md:py-4 md:px-6 shadow-sm",
+        "sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b py-4 px-4 md:py-4 md:px-6 shadow-sm",
         "border-cargo-gray/30",
         className
       )}
@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
           <img 
             src="/lovable-uploads/dca130f5-7f04-4515-b0f0-b942b6a23c5a.png" 
             alt="Cargo Claro" 
-            className="h-7 md:h-8 w-auto object-contain"
+            className="h-8 md:h-9 w-auto object-contain"
           />
         )}
       </div>

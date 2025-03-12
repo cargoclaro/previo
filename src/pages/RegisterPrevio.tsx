@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
-import { ChevronRight } from 'lucide-react';
+import { Building2, Calendar, FileInput, Package2, FileText, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 
@@ -120,95 +120,109 @@ const RegisterPrevio = () => {
 
   return (
     <PageTransition>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
         <Header title="Nuevo Previo - Datos del Cliente" showBackButton />
         
         <main className="flex-1 px-4 py-6 pb-32">
-          <div className="container max-w-3xl mx-auto space-y-6">
-            <Card className="p-6 space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Cliente
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <Input
-                  value={clientData.client}
-                  onChange={(e) => updateField('client', e.target.value)}
-                  placeholder="Nombre del cliente"
-                />
-              </div>
+          <div className="container max-w-md mx-auto space-y-6">
+            <Card className="p-6 space-y-6 shadow-md border-cargo-gray/40 animate-scale-in">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+                    <Building2 className="w-4 h-4 text-cargo-orange" />
+                    Cliente
+                    <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    value={clientData.client}
+                    onChange={(e) => updateField('client', e.target.value)}
+                    placeholder="Nombre del cliente"
+                    className="border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Fecha
-                </label>
-                <Input
-                  type="date"
-                  value={clientData.date}
-                  onChange={(e) => updateField('date', e.target.value)}
-                />
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+                    <Calendar className="w-4 h-4 text-cargo-orange" />
+                    Fecha
+                  </label>
+                  <Input
+                    type="date"
+                    value={clientData.date}
+                    onChange={(e) => updateField('date', e.target.value)}
+                    className="border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Número de Entrada
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <Input
-                  value={clientData.entry}
-                  onChange={(e) => updateField('entry', e.target.value)}
-                  placeholder="Número de entrada"
-                />
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+                    <FileInput className="w-4 h-4 text-cargo-orange" />
+                    Número de Entrada
+                    <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    value={clientData.entry}
+                    onChange={(e) => updateField('entry', e.target.value)}
+                    placeholder="Número de entrada"
+                    className="border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Proveedor
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <Input
-                  value={clientData.supplier}
-                  onChange={(e) => updateField('supplier', e.target.value)}
-                  placeholder="Nombre del proveedor"
-                />
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+                    <Building2 className="w-4 h-4 text-cargo-orange" />
+                    Proveedor
+                    <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    value={clientData.supplier}
+                    onChange={(e) => updateField('supplier', e.target.value)}
+                    placeholder="Nombre del proveedor"
+                    className="border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Orden de Compra
-                </label>
-                <Input
-                  value={clientData.purchaseOrder}
-                  onChange={(e) => updateField('purchaseOrder', e.target.value)}
-                  placeholder="Número de orden de compra"
-                />
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+                    <Package2 className="w-4 h-4 text-cargo-orange" />
+                    Orden de Compra
+                  </label>
+                  <Input
+                    value={clientData.purchaseOrder}
+                    onChange={(e) => updateField('purchaseOrder', e.target.value)}
+                    placeholder="Número de orden de compra"
+                    className="border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Número de Guía
-                </label>
-                <Input
-                  value={clientData.trackingNumber}
-                  onChange={(e) => updateField('trackingNumber', e.target.value)}
-                  placeholder="Número de guía"
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+                    <FileText className="w-4 h-4 text-cargo-orange" />
+                    Número de Guía
+                  </label>
+                  <Input
+                    value={clientData.trackingNumber}
+                    onChange={(e) => updateField('trackingNumber', e.target.value)}
+                    placeholder="Número de guía"
+                    className="border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  />
+                </div>
               </div>
             </Card>
           </div>
         </main>
         
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
-          <div className="container max-w-3xl mx-auto p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-cargo-gray/30 py-4 px-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+          <div className="container max-w-md mx-auto">
             <Button
               onClick={handleSubmit}
-              className="w-full h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full h-12 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Creando...' : (
                 <>
-                  <ChevronRight className="w-5 h-5 mr-2" />
                   Continuar a Embalaje
+                  <ChevronRight className="w-5 h-5 ml-1" />
                 </>
               )}
             </Button>
