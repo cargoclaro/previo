@@ -51,8 +51,7 @@ export const usePrevioForm = (user: User | null) => {
     setIsSubmitting(true);
     
     try {
-      // Use the get_profile_by_auth_id function instead of querying profiles table directly
-      // This avoids the RLS recursion issue
+      // Using the fixed RPC function to get profile data
       const { data: profileData, error: profileError } = await supabase
         .rpc('get_profile_by_auth_id', { auth_id: user.id })
         .single();
