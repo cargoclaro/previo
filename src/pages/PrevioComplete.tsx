@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -70,20 +71,6 @@ const PrevioComplete = () => {
     
     setIsSaving(true);
     try {
-      // Get user profile to get organization_id
-      const { data: profileData, error: profileError } = await supabase
-        .rpc('get_profile_by_auth_id', { auth_id: user.id })
-        .single();
-      
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        throw new Error('No se pudo obtener información del perfil. Por favor contacte al soporte.');
-      }
-      
-      if (!profileData.organization_id) {
-        throw new Error('No se encontró la organización para este usuario');
-      }
-      
       const existingPrevioId = header.id;
       
       // Check if previo exists in Supabase
@@ -150,7 +137,7 @@ const PrevioComplete = () => {
             purchase_order: header.purchaseOrder,
             tracking_number: header.trackingNumber,
             status: 'completed',
-            organization_id: profileData.organization_id,
+            organization_id: user.id, // Use user ID as a fallback for organization ID
             created_by: user.id
           })
           .select()

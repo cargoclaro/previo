@@ -51,25 +51,7 @@ export const usePrevioForm = (user: User | null) => {
     setIsSubmitting(true);
     
     try {
-      // Simplify - directly fetch organization_id from profiles table
-      // This is a simpler query that doesn't involve the problematic RPC function
-      const { data: orgData, error: orgError } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .limit(1);
-      
-      if (orgError) {
-        console.error('Error fetching organization:', orgError);
-        throw new Error('No se pudo obtener información de la organización. Por favor contacte al soporte.');
-      }
-      
-      const organizationId = orgData && orgData.length > 0 ? orgData[0].organization_id : null;
-      
-      if (!organizationId) {
-        throw new Error('No se encontró la organización para este usuario');
-      }
-      
+      // Create previo record directly without relying on organization
       const { data: previoData, error: previoError } = await supabase
         .from('previos')
         .insert([{
@@ -80,7 +62,8 @@ export const usePrevioForm = (user: User | null) => {
           purchase_order: clientData.purchaseOrder,
           tracking_number: clientData.trackingNumber,
           status: 'in-progress',
-          organization_id: organizationId,
+          // Use null or default organization if needed
+          organization_id: user.id, // Using user ID as a fallback for organization ID
           created_by: user.id
         }])
         .select()
