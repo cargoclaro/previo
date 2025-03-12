@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import Button from '@/components/common/Button';
 import { toast } from 'sonner';
 import { Mail, Lock, User, Building } from 'lucide-react';
+
 const Auth = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -16,7 +17,6 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [organization, setOrganization] = useState('');
 
-  // Handle sign in with email
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -37,7 +37,6 @@ const Auth = () => {
     }
   };
 
-  // Handle sign up with email
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -64,15 +63,23 @@ const Auth = () => {
       setIsLoading(false);
     }
   };
+
   return <PageTransition>
       <div className="min-h-screen flex flex-col bg-orange-50">
-        {/* Added logo and name at the top left */}
         <div className="p-6">
           <div className="flex items-center gap-3">
-            <img src="/lovable-uploads/5fb656fd-06e2-44f8-9b8b-343ebe591e4b.png" alt="Cargo Claro" className="h-8" onError={e => {
-            e.currentTarget.src = 'https://via.placeholder.com/120x30?text=Cargo+Claro';
-          }} />
-            <h2 className="text-xl font-bold text-orange-600">Cargo Claro</h2>
+            <img 
+              src="/lovable-uploads/dca130f5-7f04-4515-b0f0-b942b6a23c5a.png" 
+              alt="Cargo Claro Logo" 
+              className="h-8 w-auto"
+              onError={e => {
+                e.currentTarget.src = 'https://via.placeholder.com/32x32?text=CC';
+              }}
+            />
+            <div className="flex flex-col">
+              <h2 className="text-xl font-bold text-orange-600">Previo</h2>
+              <p className="text-sm text-orange-500">by Cargo Claro</p>
+            </div>
           </div>
         </div>
 
@@ -132,4 +139,5 @@ const Auth = () => {
       </div>
     </PageTransition>;
 };
+
 export default Auth;
