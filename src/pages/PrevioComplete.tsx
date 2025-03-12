@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -129,7 +130,7 @@ const PrevioComplete = () => {
             
             <Button
               onClick={handleReturnHome}
-              variant="link"
+              variant="outline"
               className="text-orange-700 hover:text-orange-800 font-medium"
             >
               Volver al inicio
@@ -141,4 +142,4 @@ const PrevioComplete = () => {
   );
 };
 
-export default PrevioComplete; 
+export default PrevioComplete;

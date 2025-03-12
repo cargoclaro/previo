@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -23,26 +24,51 @@ interface PrevioHeaderData {
   trackingNumber: string;
 }
 
+interface Product {
+  id: string;
+  code: string;
+  detailedDescription: string;
+  quantity: number;
+  unitOfMeasure: string;
+  weight: number;
+  origin: string;
+  matchesInvoice: boolean;
+  discrepancy: string;
+  productPhoto: string | null;
+  hasLabel: boolean;
+  labelPhoto: string | null;
+  hasSerialNumber: boolean;
+  serialNumber: string;
+  serialPhoto: string | null;
+  hasModel: boolean;
+  modelNumber: string;
+}
+
 const PrevioPreview = () => {
   const navigate = useNavigate();
   const [headerData, setHeaderData] = useState<PrevioHeaderData | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
   const [pdfDataUrl, setPdfDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Get the saved form data
-    const savedData = localStorage.getItem('previoHeader');
-    if (!savedData) {
+    const savedHeader = localStorage.getItem('previoHeader');
+    const savedProducts = localStorage.getItem('previoProducts');
+    
+    if (!savedHeader || !savedProducts) {
       toast.error('No se encontraron datos del previo');
       navigate('/register-previo');
       return;
     }
 
-    const parsedData = JSON.parse(savedData);
-    setHeaderData(parsedData);
+    const parsedHeaderData = JSON.parse(savedHeader);
+    const parsedProductsData = JSON.parse(savedProducts);
+    setHeaderData(parsedHeaderData);
+    setProducts(parsedProductsData);
 
     // Generate PDF preview automatically
     try {
-      const dataUrl = generatePrevioDataURL(parsedData);
+      const dataUrl = generatePrevioDataURL(parsedHeaderData, parsedProductsData);
       setPdfDataUrl(dataUrl);
     } catch (error) {
       console.error('Error generating PDF preview:', error);
@@ -51,10 +77,10 @@ const PrevioPreview = () => {
   }, [navigate]);
 
   const handleDownloadPDF = () => {
-    if (!headerData) return;
+    if (!headerData || !products) return;
     
     try {
-      generatePrevioPDF(headerData, `previo_${headerData.entry || 'nuevo'}.pdf`);
+      generatePrevioPDF(headerData, products, `previo_${headerData.entry || 'nuevo'}.pdf`);
       toast.success('PDF descargado correctamente');
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -148,4 +174,4 @@ const PrevioPreview = () => {
   );
 };
 
-export default PrevioPreview; 
+export default PrevioPreview;

@@ -1,3 +1,4 @@
+
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { autoTable } from 'jspdf-autotable';
@@ -181,7 +182,7 @@ const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[]): jsP
   });
   
   // Add footer
-  const pageCount = doc.internal.getNumberOfPages();
+  const pageCount = (doc as any).internal.pages.length;
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
@@ -222,5 +223,5 @@ export const generatePrevioPDF = (
 export const generatePrevioDataURL = (headerData: PrevioHeaderData, products: Product[]): string => {
   // Create the PDF document and return as data URL
   const doc = createPrevioPDF(headerData, products);
-  return `data:application/pdf;base64,${doc.output('base64')}`;
-}; 
+  return doc.output('datauristring');
+};
