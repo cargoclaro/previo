@@ -51,17 +51,22 @@ export const usePrevioForm = (user: User | null) => {
     setIsSubmitting(true);
     
     try {
-      // Using the fixed RPC function to get profile data
-      const { data: profileData, error: profileError } = await supabase
-        .rpc('get_profile_by_auth_id', { auth_id: user.id })
-        .single();
+      // Simplify - directly fetch organization_id from profiles table
+      // This is a simpler query that doesn't involve the problematic RPC function
+      const { data: orgData, error: orgError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .limit(1);
       
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        throw new Error('No se pudo obtener información del perfil. Por favor contacte al soporte.');
+      if (orgError) {
+        console.error('Error fetching organization:', orgError);
+        throw new Error('No se pudo obtener información de la organización. Por favor contacte al soporte.');
       }
       
-      if (!profileData.organization_id) {
+      const organizationId = orgData && orgData.length > 0 ? orgData[0].organization_id : null;
+      
+      if (!organizationId) {
         throw new Error('No se encontró la organización para este usuario');
       }
       
@@ -75,7 +80,7 @@ export const usePrevioForm = (user: User | null) => {
           purchase_order: clientData.purchaseOrder,
           tracking_number: clientData.trackingNumber,
           status: 'in-progress',
-          organization_id: profileData.organization_id,
+          organization_id: organizationId,
           created_by: user.id
         }])
         .select()
