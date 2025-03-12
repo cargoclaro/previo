@@ -60,14 +60,17 @@ const RegisterPrevio = () => {
     setIsSubmitting(true);
     
     try {
-      // Get user profile to get organization_id
+      // Get user profile to get organization_id using the direct query
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id')
         .eq('id', user.id)
         .single();
       
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw new Error('No se pudo obtener información del perfil. Por favor contacte al soporte.');
+      }
       
       if (!profileData.organization_id) {
         throw new Error('No se encontró la organización para este usuario');
@@ -92,7 +95,10 @@ const RegisterPrevio = () => {
         .select()
         .single();
       
-      if (previoError) throw previoError;
+      if (previoError) {
+        console.error('Error creating previo:', previoError);
+        throw previoError;
+      }
       
       // Save to localStorage for compatibility with existing flow
       localStorage.setItem('previoHeader', JSON.stringify({
