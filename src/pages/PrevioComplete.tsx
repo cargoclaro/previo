@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -73,12 +72,17 @@ const PrevioComplete = () => {
     try {
       // Get user profile to get organization_id
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
+        .rpc('get_profile_by_auth_id', { auth_id: user.id })
         .single();
       
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw new Error('No se pudo obtener información del perfil. Por favor contacte al soporte.');
+      }
+      
+      if (!profileData.organization_id) {
+        throw new Error('No se encontró la organización para este usuario');
+      }
       
       const existingPrevioId = header.id;
       
