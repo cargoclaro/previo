@@ -73,6 +73,21 @@ const Auth = () => {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col bg-orange-50">
+        {/* Added logo and name at the top left */}
+        <div className="p-6">
+          <div className="flex items-center gap-3">
+            <img 
+              src="/lovable-uploads/5fb656fd-06e2-44f8-9b8b-343ebe591e4b.png" 
+              alt="Cargo Claro" 
+              className="h-8"
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/120x30?text=Cargo+Claro';
+              }}
+            />
+            <h2 className="text-xl font-bold text-orange-600">Previo</h2>
+          </div>
+        </div>
+
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">
