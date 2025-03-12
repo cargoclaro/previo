@@ -182,7 +182,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_profile_by_auth_id: {
+        Args: {
+          auth_id: string
+        }
+        Returns: {
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          organization_id: string | null
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

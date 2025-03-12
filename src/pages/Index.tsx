@@ -20,17 +20,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   description,
   onClick
 }) => {
-  return <Card onClick={onClick} className="hover:translate-y-[-2px] transition-transform duration-300">
+  return (
+    <Card 
+      onClick={onClick} 
+      className="hover:translate-y-[-2px] active:translate-y-0 transition-all duration-200"
+    >
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-cargo-orange/10 rounded-full text-cargo-orange">
+        <div className="p-3 bg-gradient-to-br from-cargo-orange/20 to-cargo-orange/10 rounded-full text-cargo-orange">
           {icon}
         </div>
-        <div className="flex-1">
-          <h3 className="font-medium text-lg">{title}</h3>
-          <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-base md:text-lg text-gray-900 truncate">{title}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
         </div>
       </div>
-    </Card>;
+    </Card>
+  );
 };
 
 const Index = () => {
@@ -73,7 +78,7 @@ const Index = () => {
   
   return (
     <PageTransition>
-      <div className="flex flex-col min-h-screen bg-cargo-light">
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-cargo-light to-white">
         <Header title="Cargo Claro" />
         
         <main className="flex-1 px-4 py-6 container max-w-md mx-auto">
@@ -81,16 +86,21 @@ const Index = () => {
             <section className="space-y-6 animate-slide-up">
               <div className="flex justify-between items-center">
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-medium tracking-tight">Dashboard de Previos</h2>
-                  <p className="text-muted-foreground">Selecciona una opción para comenzar</p>
+                  <h2 className="text-xl md:text-2xl font-medium tracking-tight text-gray-900">
+                    Dashboard de Previos
+                  </h2>
+                  <p className="text-sm md:text-base text-muted-foreground">
+                    Selecciona una opción para comenzar
+                  </p>
                 </div>
                 
                 <button
                   onClick={handleSignOut}
-                  className="p-2.5 text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 flex items-center gap-2 hover:text-gray-900"
+                  className="p-2.5 text-gray-600 hover:bg-gray-100 active:bg-gray-200 rounded-full 
+                    transition-all duration-200 flex items-center gap-2 hover:text-gray-900"
                   aria-label="Cerrar sesión"
                 >
-                  <LogOut size={20} />
+                  <LogOut className="w-5 h-5" />
                 </button>
               </div>
               
@@ -107,20 +117,26 @@ const Index = () => {
               </div>
             </section>
           ) : (
-            <section className="space-y-6 animate-slide-up text-center">
-              <div className="p-8 bg-orange-100 rounded-full w-24 h-24 mx-auto">
+            <section className="space-y-8 animate-slide-up text-center py-8">
+              <div className="p-8 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full w-24 h-24 mx-auto">
                 <User size={48} className="text-orange-600 mx-auto mt-2" />
               </div>
               
               <div className="space-y-2">
-                <h2 className="text-2xl font-medium tracking-tight">Bienvenido a Cargo Claro</h2>
-                <p className="text-muted-foreground">Inicia sesión para acceder a tu cuenta</p>
+                <h2 className="text-2xl font-medium tracking-tight text-gray-900">
+                  Bienvenido a Cargo Claro
+                </h2>
+                <p className="text-muted-foreground">
+                  Inicia sesión para acceder a tu cuenta
+                </p>
               </div>
               
-              <div className="pt-4">
+              <div>
                 <button
                   onClick={() => navigate('/auth')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md shadow-sm"
+                  className="bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 
+                    hover:to-orange-500/90 active:scale-[0.98] text-white px-6 py-3 rounded-lg 
+                    shadow-sm transition-all duration-200 font-medium"
                 >
                   Iniciar Sesión
                 </button>
