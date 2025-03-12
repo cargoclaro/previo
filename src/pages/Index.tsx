@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -86,15 +85,13 @@ const Index = () => {
                   <p className="text-muted-foreground">Selecciona una opción para comenzar</p>
                 </div>
                 
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSignOut}
-                    className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
-                    aria-label="Cerrar sesión"
-                  >
-                    <LogOut size={20} />
-                  </button>
-                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="p-2.5 text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 flex items-center gap-2 hover:text-gray-900"
+                  aria-label="Cerrar sesión"
+                >
+                  <LogOut size={20} />
+                </button>
               </div>
               
               <div className="grid gap-4">
