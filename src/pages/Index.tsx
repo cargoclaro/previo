@@ -129,7 +129,7 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/60 to-transparent"></div>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-4 -mt-16">
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900">
                   <span className="text-cargo-orange">Previo App</span>
                   <span className="block text-sm font-normal text-gray-500">by Cargo Claro</span>
