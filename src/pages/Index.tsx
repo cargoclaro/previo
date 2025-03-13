@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Card from '@/components/common/Card';
 import PageTransition from '@/components/layout/PageTransition';
-import { ClipboardList, FileText, History, LogOut, User } from 'lucide-react';
+import { ClipboardList, FileText, History, LogOut, User, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -73,6 +73,13 @@ const Index = () => {
       icon: <History size={24} />,
       description: 'Ver todos los previos completados',
       path: '/previos-history'
+    },
+    {
+      id: 'products-gallery',
+      title: 'Galería de Productos',
+      icon: <Package size={24} />,
+      description: 'Ver todos los productos registrados en el sistema',
+      path: '/products-gallery'
     }
   ];
   

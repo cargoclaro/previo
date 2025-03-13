@@ -178,6 +178,10 @@ const PrevioDetails = () => {
     }
   };
 
+  const handleProductClick = (productId: string) => {
+    navigate(`/product-details/${productId}`);
+  };
+
   if (isLoading) {
     return (
       <PageTransition>
@@ -214,9 +218,9 @@ const PrevioDetails = () => {
       <div className="flex flex-col min-h-screen">
         <Header title="Detalles del Previo" showBackButton />
         
-        <main className="flex-1 pl-5 pr-0 py-6">
-          <div className="container max-w-3xl mx-auto space-y-6">
-            <Card className="p-6">
+        <main className="flex-1 px-4 py-6">
+          <div className="container mx-auto max-w-3xl">
+            <Card className="p-6 mb-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Información del Previo</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -311,7 +315,11 @@ const PrevioDetails = () => {
               {products.length > 0 ? (
                 <div className="space-y-4">
                   {products.map((product) => (
-                    <div key={product.id} className="border rounded-lg p-4">
+                    <div 
+                      key={product.id} 
+                      className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => handleProductClick(product.id)}
+                    >
                       <h3 className="font-medium">{product.name}</h3>
                       {product.description && (
                         <p className="text-sm text-gray-600 mt-1">{product.description}</p>
@@ -336,16 +344,60 @@ const PrevioDetails = () => {
                         )}
                       </div>
                       
-                      {product.image_url && (
-                        <div className="mt-3">
-                          <p className="text-gray-500 text-sm mb-1">Imagen</p>
-                          <img 
-                            src={product.image_url} 
-                            alt={product.name} 
-                            className="w-24 h-24 object-cover rounded-md"
-                          />
+                      <div className="mt-3">
+                        <p className="text-gray-500 text-sm mb-1">Imágenes</p>
+                        <div className="flex space-x-2 overflow-x-auto pb-2">
+                          {product.image_url && (
+                            <div className="flex-shrink-0">
+                              <img 
+                                src={product.image_url} 
+                                alt={product.name} 
+                                className="w-24 h-24 object-cover rounded-md"
+                              />
+                            </div>
+                          )}
+                          
+                          {/* Try to find additional images in localStorage */}
+                          {(() => {
+                            try {
+                              const savedProducts = localStorage.getItem('previoProducts');
+                              if (savedProducts) {
+                                const parsedProducts = JSON.parse(savedProducts);
+                                const matchingProduct = parsedProducts.find((p: any) => p.id === product.id);
+                                
+                                if (matchingProduct) {
+                                  return (
+                                    <>
+                                      {matchingProduct.hasLabel && matchingProduct.labelPhoto && (
+                                        <div className="flex-shrink-0">
+                                          <img 
+                                            src={matchingProduct.labelPhoto} 
+                                            alt={`Etiqueta de ${product.name}`} 
+                                            className="w-24 h-24 object-cover rounded-md"
+                                          />
+                                        </div>
+                                      )}
+                                      
+                                      {matchingProduct.hasSerialNumber && matchingProduct.serialPhoto && (
+                                        <div className="flex-shrink-0">
+                                          <img 
+                                            src={matchingProduct.serialPhoto} 
+                                            alt={`Número de serie de ${product.name}`} 
+                                            className="w-24 h-24 object-cover rounded-md"
+                                          />
+                                        </div>
+                                      )}
+                                    </>
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              console.error('Error parsing saved products:', e);
+                            }
+                            return null;
+                          })()}
                         </div>
-                      )}
+                      </div>
                     </div>
                   ))}
                 </div>

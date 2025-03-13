@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
@@ -16,6 +15,8 @@ import PrevioPreview from './pages/PrevioPreview';
 import PrevioComplete from './pages/PrevioComplete';
 import PreviosHistory from './pages/PreviosHistory';
 import PrevioDetails from './pages/PrevioDetails';
+import ProductsGallery from './pages/ProductsGallery';
+import ProductDetails from './pages/ProductDetails';
 import NotFound from './pages/NotFound';
 
 import './App.css';
@@ -74,6 +75,16 @@ function App() {
           <Route path="/previo-details/:previoId" element={
             <ProtectedRoute>
               <PrevioDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="/products-gallery" element={
+            <ProtectedRoute>
+              <ProductsGallery />
+            </ProtectedRoute>
+          } />
+          <Route path="/product-details/:productId" element={
+            <ProtectedRoute>
+              <ProductDetails />
             </ProtectedRoute>
           } />
         </Routes>
