@@ -135,7 +135,7 @@ const Index = () => {
                   <span className="block text-sm font-normal text-gray-500">by Cargo Claro</span>
                 </h2>
                 <p className="text-lg text-gray-600">
-                  Gestiona tus procesos de importación de manera eficiente, asistencia a la glosa aduanal.
+                  Asistencia a la glosa aduanal.
                 </p>
               </div>
               
