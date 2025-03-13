@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -119,17 +118,24 @@ const Index = () => {
               </div>
             </section>
           ) : (
-            <section className="space-y-8 animate-slide-up text-center py-8">
-              <div className="p-8 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full w-24 h-24 mx-auto">
-                <User size={48} className="text-orange-600 mx-auto mt-2" />
+            <section className="space-y-12 animate-slide-up text-center py-16">
+              {/* Hero image and gradient overlay */}
+              <div className="relative aspect-square w-full max-w-sm mb-8 rounded-2xl overflow-hidden mx-auto">
+                <img 
+                  src="/lovable-uploads/woker.jpg" 
+                  alt="Cargo worker checking information" 
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/60 to-transparent"></div>
               </div>
               
-              <div className="space-y-2">
-                <h2 className="text-2xl font-medium tracking-tight text-gray-900">
-                  Bienvenido a Cargo Claro
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                  <span className="text-cargo-orange">Previo App</span>
+                  <span className="block text-sm font-normal text-gray-500">by Cargo Claro</span>
                 </h2>
-                <p className="text-muted-foreground">
-                  Inicia sesión para acceder a tu cuenta
+                <p className="text-lg text-gray-600">
+                  Gestiona tus procesos de importación de manera eficiente, asistencia a la glosa aduanal.
                 </p>
               </div>
               
@@ -137,10 +143,11 @@ const Index = () => {
                 <button
                   onClick={() => navigate('/auth')}
                   className="bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 
-                    hover:to-orange-500/90 active:scale-[0.98] text-white px-6 py-3 rounded-lg 
-                    shadow-sm transition-all duration-200 font-medium"
+                    hover:to-orange-500/90 active:scale-[0.98] text-white px-8 py-4 rounded-xl 
+                    shadow-lg shadow-orange-500/20 transition-all duration-200 font-medium text-lg
+                    hover:shadow-xl hover:shadow-orange-500/30"
                 >
-                  Iniciar Sesión
+                  Comenzar
                 </button>
               </div>
             </section>

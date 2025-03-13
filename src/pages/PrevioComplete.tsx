@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -73,6 +72,16 @@ const PrevioComplete = () => {
     try {
       const existingPrevioId = header.id;
       
+      // Get the organization ID first
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id')
+        .single();
+
+      if (orgError) {
+        throw new Error('No se pudo obtener la organización');
+      }
+
       // Check if previo exists in Supabase
       if (existingPrevioId) {
         // Update the existing previo
@@ -137,7 +146,7 @@ const PrevioComplete = () => {
             purchase_order: header.purchaseOrder,
             tracking_number: header.trackingNumber,
             status: 'completed',
-            organization_id: user.id, // Use user ID as a fallback for organization ID
+            organization_id: orgData.id, // Use the correct organization ID
             created_by: user.id
           })
           .select()

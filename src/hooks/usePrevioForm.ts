@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -51,7 +50,17 @@ export const usePrevioForm = (user: User | null) => {
     setIsSubmitting(true);
     
     try {
-      // Create previo record directly without relying on organization
+      // Get the organization ID first
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id')
+        .single();
+
+      if (orgError) {
+        throw new Error('No se pudo obtener la organización');
+      }
+
+      // Create previo record with the correct organization_id
       const { data: previoData, error: previoError } = await supabase
         .from('previos')
         .insert([{
@@ -62,8 +71,7 @@ export const usePrevioForm = (user: User | null) => {
           purchase_order: clientData.purchaseOrder,
           tracking_number: clientData.trackingNumber,
           status: 'in-progress',
-          // Use null or default organization if needed
-          organization_id: user.id, // Using user ID as a fallback for organization ID
+          organization_id: orgData.id, // Use the correct organization ID
           created_by: user.id
         }])
         .select()

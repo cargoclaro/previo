@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,9 +76,8 @@ const Auth = () => {
                 e.currentTarget.src = 'https://via.placeholder.com/32x32?text=CC';
               }}
             />
-            <div className="flex flex-col">
+            <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-orange-600">Previo</h2>
-              <p className="text-sm text-gray-500">by Cargo Claro</p>
             </div>
           </div>
         </div>

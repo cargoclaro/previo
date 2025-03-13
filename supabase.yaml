@@ -1,0 +1,12 @@
+supabase.md
+
+connection string: 
+
+postgresql://postgres.xouxjwrfohpioiydyjzb:qewzuq-fyvZo6-navwer@aws-0-us-west-1.pooler.supabase.com:5432/postgres
+
+
+Database password: 
+
+
+npx -y @modelcontextprotocol/server-postgres postgresql://postgres.xouxjwrfohpioiydyjzb:qewzuq-fyvZo6-navwer@aws-0-us-west-1.pooler.supabase.com:5432/postgres
+
