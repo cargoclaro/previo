@@ -138,8 +138,8 @@ const EmbalajePrevio = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
         <Header title="Nuevo Previo - Datos de Embalaje" showBackButton />
         
-        <main className="flex-1 pl-5 pr-0 py-4 pb-20">
-          <div className="w-full max-w-3xl mx-auto">
+        <main className="flex-1 container mx-auto py-4 pb-20 px-4">
+          <div className="w-full max-w-md mx-auto">
             <EmbalajeFormFields
               headerData={headerData}
               updateField={updateField}
@@ -167,7 +167,7 @@ const EmbalajePrevio = () => {
         </main>
         
         <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-          <div className="w-full max-w-3xl mx-auto">
+          <div className="w-full max-w-md mx-auto">
             <Button
               onClick={handleSubmit}
               className="w-full h-10 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"

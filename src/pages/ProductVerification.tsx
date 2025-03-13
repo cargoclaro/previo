@@ -293,8 +293,8 @@ const ProductVerification = () => {
         <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
           <Header title="Vista Previa de Previo" showBackButton />
           
-          <main className="flex-1 pl-5 pr-0 py-4 pb-20">
-            <div className="w-full max-w-3xl mx-auto space-y-4">
+          <main className="flex-1 container mx-auto py-4 pb-20 px-4">
+            <div className="w-full max-w-md mx-auto space-y-4">
               <Card className="p-4">
                 <h2 className="text-xl font-semibold mb-4">Resumen del Previo</h2>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -331,7 +331,7 @@ const ProductVerification = () => {
           </main>
           
           <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-            <div className="w-full max-w-3xl mx-auto flex gap-2">
+            <div className="w-full max-w-md mx-auto flex gap-2">
               <Button
                 onClick={() => setShowPreview(false)}
                 className="h-10 text-base font-medium bg-gray-100 hover:bg-gray-200 text-gray-800 flex-1"
@@ -365,8 +365,8 @@ const ProductVerification = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
         <Header title="Verificación de Productos" showBackButton />
         
-        <main className="flex-1 pl-5 pr-0 py-4 pb-20">
-          <div className="w-full max-w-3xl mx-auto">
+        <main className="flex-1 container mx-auto py-4 pb-20 px-4">
+          <div className="w-full max-w-md mx-auto">
             <ProductFormFields
               products={products}
               currentProductIndex={currentProductIndex}
@@ -380,7 +380,7 @@ const ProductVerification = () => {
         </main>
         
         <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-          <div className="w-full max-w-3xl mx-auto">
+          <div className="w-full max-w-md mx-auto">
             <Button
               onClick={handleSubmit}
               className="w-full h-10 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"
