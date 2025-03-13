@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
@@ -20,6 +19,24 @@ const GoodsCondition = () => {
   const [packagingPhoto, setPackagingPhoto] = useState<string | null>(null);
   const [sealsPhoto, setSealsPhoto] = useState<string | null>(null);
   const [palletPhoto, setPalletPhoto] = useState<string | null>(null);
+  
+  // Add state for previoId
+  const [previoId, setPrevioId] = useState<string>('temp-inspection-id');
+  
+  // Initialize previoId from localStorage
+  useEffect(() => {
+    const previoHeader = localStorage.getItem('previoHeader');
+    if (previoHeader) {
+      try {
+        const data = JSON.parse(previoHeader);
+        if (data.id) {
+          setPrevioId(data.id);
+        }
+      } catch (error) {
+        console.error('Error parsing previo header:', error);
+      }
+    }
+  }, []);
 
   const handleContinue = () => {
     // Check if required photos are captured based on toggle states
@@ -67,6 +84,9 @@ const GoodsCondition = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Captura Evidencia De Estado de Embalaje"
+                    operationType="inspeccion"
+                    operationId={previoId}
+                    description="Estado del embalaje"
                     onPhotoCapture={(photo) => setPackagingPhoto(photo)}
                     required
                   />
@@ -83,6 +103,9 @@ const GoodsCondition = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Captura Evidencia de Sellos de Embalaje"
+                    operationType="inspeccion"
+                    operationId={previoId}
+                    description="Sellos del embalaje"
                     onPhotoCapture={(photo) => setSealsPhoto(photo)}
                     required
                   />
@@ -99,6 +122,9 @@ const GoodsCondition = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Tomar foto de Tarima"
+                    operationType="inspeccion"
+                    operationId={previoId}
+                    description="Tarima certificada"
                     onPhotoCapture={(photo) => setPalletPhoto(photo)}
                     required
                   />

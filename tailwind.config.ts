@@ -1,5 +1,5 @@
-
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -54,7 +54,7 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				cargo: {
-					orange: '#FF6B39',
+					orange: 'rgb(255, 84, 0)',
 					light: '#F5F7FA',
 					blue: '#7FB0C6',
 					darkblue: '#536D7B',
@@ -125,5 +125,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [animate],
 } satisfies Config;

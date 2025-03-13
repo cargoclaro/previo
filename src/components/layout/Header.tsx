@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -37,16 +36,19 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </button>
           )}
-          <h1 className="text-lg md:text-xl font-medium text-gray-900">{title}</h1>
+          {location.pathname === '/' ? (
+            <div className="flex items-center gap-3">
+              <img 
+                src="/lovable-uploads/dca130f5-7f04-4515-b0f0-b942b6a23c5a.png" 
+                alt="Cargo Claro" 
+                className="h-8 md:h-9 w-auto object-contain"
+              />
+              <h1 className="text-lg md:text-xl font-medium text-gray-900">{title}</h1>
+            </div>
+          ) : (
+            <h1 className="text-lg md:text-xl font-medium text-gray-900">{title}</h1>
+          )}
         </div>
-        
-        {location.pathname === '/' && (
-          <img 
-            src="/lovable-uploads/dca130f5-7f04-4515-b0f0-b942b6a23c5a.png" 
-            alt="Cargo Claro" 
-            className="h-8 md:h-9 w-auto object-contain"
-          />
-        )}
       </div>
     </header>
   );

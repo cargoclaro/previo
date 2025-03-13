@@ -50,6 +50,24 @@ const EmbalajePrevio = () => {
   const [sealsPhoto, setSealsPhoto] = useState<string | null>(null);
   const [palletPhoto, setPalletPhoto] = useState<string | null>(null);
 
+  // Add these states to track previoId
+  const [previoId, setPrevioId] = useState<string>('');
+  
+  // Get previoId from localStorage or URL params on component mount
+  useEffect(() => {
+    const previoHeader = localStorage.getItem('previoHeader');
+    if (previoHeader) {
+      const data = JSON.parse(previoHeader);
+      if (data.id) {
+        setPrevioId(data.id);
+      }
+    }
+    // You might also get it from URL params if available
+    // const params = new URLSearchParams(window.location.search);
+    // const idFromParams = params.get('id');
+    // if (idFromParams) setPrevioId(idFromParams);
+  }, []);
+
   useEffect(() => {
     // Load existing header data
     const savedHeader = localStorage.getItem('previoHeader');
@@ -236,6 +254,9 @@ const EmbalajePrevio = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Captura Evidencia De Estado de Embalaje"
+                    operationType="embalaje"
+                    operationId={previoId}
+                    description="Estado del embalaje"
                     onPhotoCapture={(photo) => setPackagingPhoto(photo)}
                     required
                   />
@@ -252,6 +273,9 @@ const EmbalajePrevio = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Captura Evidencia de Sellos de Embalaje"
+                    operationType="embalaje"
+                    operationId={previoId}
+                    description="Sellos del embalaje"
                     onPhotoCapture={(photo) => setSealsPhoto(photo)}
                     required
                   />
@@ -268,6 +292,9 @@ const EmbalajePrevio = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Tomar foto de Tarima"
+                    operationType="embalaje"
+                    operationId={previoId}
+                    description="Tarima certificada"
                     onPhotoCapture={(photo) => setPalletPhoto(photo)}
                     required
                   />

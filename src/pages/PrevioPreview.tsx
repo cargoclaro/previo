@@ -88,10 +88,6 @@ const PrevioPreview = () => {
     }
   };
 
-  const handleContinue = () => {
-    navigate('/product-verification');
-  };
-
   if (!headerData || !pdfDataUrl) {
     return (
       <PageTransition>
@@ -152,20 +148,13 @@ const PrevioPreview = () => {
         </main>
         
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
-          <div className="container max-w-3xl mx-auto p-4 flex gap-2">
+          <div className="container max-w-3xl mx-auto p-4">
             <Button
               onClick={handleDownloadPDF}
-              className="h-14 text-base font-medium bg-gray-200 hover:bg-gray-300 text-gray-800 flex-1"
+              className="h-14 text-base font-medium bg-gray-200 hover:bg-gray-300 text-gray-800 w-full"
             >
               <FileDown className="w-5 h-5 mr-2" />
               Descargar PDF
-            </Button>
-            <Button
-              onClick={handleContinue}
-              className="h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white flex-1"
-            >
-              <ChevronRight className="w-5 h-5 mr-2" />
-              Continuar
             </Button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
@@ -314,6 +314,24 @@ const ProductVerification = () => {
     { value: 'pallets', label: 'Pallets' },
   ];
 
+  // Add state for previoId
+  const [previoId, setPrevioId] = useState<string>('');
+  
+  // Initialize previoId from localStorage
+  useEffect(() => {
+    const previoHeader = localStorage.getItem('previoHeader');
+    if (previoHeader) {
+      try {
+        const data = JSON.parse(previoHeader);
+        if (data.id) {
+          setPrevioId(data.id);
+        }
+      } catch (error) {
+        console.error('Error parsing previo header:', error);
+      }
+    }
+  }, []);
+
   if (showPreview && pdfDataUrl) {
     return (
       <PageTransition>
@@ -555,6 +573,10 @@ const ProductVerification = () => {
               
               <PhotoCapture
                 label="Capturar Foto de Producto"
+                operationType="previo"
+                operationId={previoId}
+                productId={currentProduct.id}
+                description="Foto general del producto"
                 onPhotoCapture={(photo) => updateProductField('productPhoto', photo)}
                 required
               />
@@ -574,6 +596,10 @@ const ProductVerification = () => {
                 <div className="pl-4 border-l-2 border-primary/20">
                   <PhotoCapture
                     label="Captura foto de Etiquetado"
+                    operationType="previo"
+                    operationId={previoId}
+                    productId={currentProduct.id}
+                    description="Etiquetado del producto"
                     onPhotoCapture={(photo) => updateProductField('labelPhoto', photo)}
                     required
                   />
@@ -608,6 +634,10 @@ const ProductVerification = () => {
                   
                   <PhotoCapture
                     label="Capturar Número de Serie"
+                    operationType="previo"
+                    operationId={previoId}
+                    productId={currentProduct.id}
+                    description="Número de serie del producto"
                     onPhotoCapture={(photo) => updateProductField('serialPhoto', photo)}
                     required
                   />

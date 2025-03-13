@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +12,7 @@ const Card: React.FC<CardProps> = ({ children, className, variant = 'default', o
   return (
     <div 
       className={cn(
-        'rounded-lg p-4 transition-all duration-200 animate-scale-in',
+        'rounded-xl w-full p-5 transition-all duration-200 animate-scale-in',
         variant === 'default' ? 'bg-white shadow-sm border border-cargo-gray' : 'glass-morphism',
         onClick && 'cursor-pointer hover:shadow-md active:scale-[0.99]',
         className

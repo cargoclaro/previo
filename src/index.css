@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 16 100% 61%;
+    --primary: 14 100% 50%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96%;
@@ -32,7 +32,7 @@
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 16 100% 61%;
+    --ring: 14 100% 50%;
 
     --radius: 0.5rem;
   }
@@ -71,7 +71,7 @@
   }
   
   .cargo-gradient {
-    background: linear-gradient(90deg, #FF6B39 0%, #FF8F6B 100%);
+    background: linear-gradient(90deg, rgb(255, 84, 0) 0%, rgb(255, 132, 64) 100%);
   }
   
   .btn-primary {
@@ -103,5 +103,19 @@
   
   .page-transition-exit-active {
     @apply opacity-0 transition-opacity duration-200;
+  }
+  
+  .doc-icon {
+    @apply p-3.5 rounded-full flex items-center justify-center;
+    background-color: rgba(255, 84, 0, 0.1);
+    color: rgb(255, 84, 0);
+  }
+  
+  .history-item-date {
+    @apply flex items-center gap-2 text-base text-gray-600;
+  }
+  
+  .history-item-badge {
+    @apply px-3 py-1 text-sm font-medium rounded-full;
   }
 }
