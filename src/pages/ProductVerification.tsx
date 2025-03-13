@@ -2,25 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
-import PrevioHeader from '@/components/PrevioHeader';
-import Card from '@/components/common/Card';
-import ToggleSwitch from '@/components/common/ToggleSwitch';
-import PhotoCapture from '@/components/common/PhotoCapture';
 import Button from '@/components/common/Button';
-import { ChevronRight, Plus, Trash, Check, Save, ArrowLeft, Camera, Package2, FileText, Scan, Tag, FileDown, Eye } from 'lucide-react';
+import { ChevronRight, ArrowLeft, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
+import ProductFormFields from '@/components/previo/ProductFormFields';
 import { generatePrevioPDF, generatePrevioDataURL } from '@/utils/pdfGenerator';
+import Card from '@/components/common/Card';
 
 // Define the Product type
 interface Product {
   id: string;
-  code: string;                    // CODIGO/LOTE
-  detailedDescription: string;     // DESCRIPCION DETALLADA
-  quantity: number;                // CANTIDAD
-  unitOfMeasure: string;          // U/M
-  weight: number;                  // PESO
-  origin: string;                  // ORIGEN
+  code: string;
+  detailedDescription: string;
+  quantity: number;
+  unitOfMeasure: string;
+  weight: number;
+  origin: string;
   matchesInvoice: boolean;
   discrepancy: string;
   productPhoto: string | null;
@@ -75,24 +72,6 @@ const ProductVerification = () => {
   // Current product being edited
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
 
-  // Mock product options
-  const productOptions = [
-    { value: 'electronica', label: 'Electrónicos' },
-    { value: 'textiles', label: 'Textiles' },
-    { value: 'alimentos', label: 'Alimentos' },
-    { value: 'quimicos', label: 'Químicos' },
-    { value: 'maquinaria', label: 'Maquinaria' },
-  ];
-
-  // Mock origin options
-  const originOptions = [
-    { value: 'USA', label: 'USA' },
-    { value: 'Germany', label: 'Germany' },
-    { value: 'Mexico', label: 'México' },
-    { value: 'China', label: 'China' },
-    { value: 'Other', label: 'Otro' },
-  ];
-
   // Load header data from localStorage
   const [headerData, setHeaderData] = useState<PrevioHeaderData>(() => {
     const savedHeader = localStorage.getItem('previoHeader');
@@ -113,19 +92,6 @@ const ProductVerification = () => {
       trackingNumber: ''
     };
   });
-
-  // Update header field function
-  const updateHeaderField = (field: string, value: string | number) => {
-    setHeaderData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    // Update localStorage
-    localStorage.setItem('previoHeader', JSON.stringify({
-      ...headerData,
-      [field]: value
-    }));
-  };
 
   // Add a new product
   const addProduct = () => {
@@ -303,17 +269,6 @@ const ProductVerification = () => {
     }
   };
 
-  // Get current product being edited
-  const currentProduct = products[currentProductIndex];
-
-  // Add these constants for unit of measure options
-  const unitOptions = [
-    { value: 'sacos', label: 'Sacos' },
-    { value: 'cajas', label: 'Cajas' },
-    { value: 'piezas', label: 'Piezas' },
-    { value: 'pallets', label: 'Pallets' },
-  ];
-
   // Add state for previoId
   const [previoId, setPrevioId] = useState<string>('');
   
@@ -335,12 +290,12 @@ const ProductVerification = () => {
   if (showPreview && pdfDataUrl) {
     return (
       <PageTransition>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
           <Header title="Vista Previa de Previo" showBackButton />
           
-          <main className="flex-1 px-4 py-6 pb-32">
-            <div className="container max-w-3xl mx-auto space-y-6">
-              <Card className="p-6">
+          <main className="flex-1 pl-5 pr-0 py-4 pb-20">
+            <div className="w-full max-w-3xl mx-auto space-y-4">
+              <Card className="p-4">
                 <h2 className="text-xl font-semibold mb-4">Resumen del Previo</h2>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -362,7 +317,7 @@ const ProductVerification = () => {
                 </div>
               </Card>
 
-              <Card className="p-6">
+              <Card className="p-4">
                 <h2 className="text-xl font-semibold mb-4">Vista Previa del Documento</h2>
                 <div className="aspect-[3/4] w-full bg-gray-50 border rounded-lg overflow-hidden">
                   <iframe
@@ -375,25 +330,25 @@ const ProductVerification = () => {
             </div>
           </main>
           
-          <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
-            <div className="container max-w-3xl mx-auto p-4 flex gap-2">
+          <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <div className="w-full max-w-3xl mx-auto flex gap-2">
               <Button
                 onClick={() => setShowPreview(false)}
-                className="h-14 text-base font-medium bg-gray-200 hover:bg-gray-300 text-gray-800 flex-1"
+                className="h-10 text-base font-medium bg-gray-100 hover:bg-gray-200 text-gray-800 flex-1"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Volver
               </Button>
               <Button
                 onClick={handleDownloadPDF}
-                className="h-14 text-base font-medium bg-gray-200 hover:bg-gray-300 text-gray-800 flex-1"
+                className="h-10 text-base font-medium bg-gray-100 hover:bg-gray-200 text-gray-800 flex-1"
               >
                 <FileDown className="w-5 h-5 mr-2" />
                 Descargar PDF
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white flex-1"
+                className="h-10 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm flex-1"
               >
                 <ChevronRight className="w-5 h-5 mr-2" />
                 Continuar
@@ -407,273 +362,28 @@ const ProductVerification = () => {
 
   return (
     <PageTransition>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
         <Header title="Verificación de Productos" showBackButton />
         
-        <main className="flex-1 px-4 py-6 pb-32">
-          <div className="container max-w-3xl mx-auto space-y-6 animate-slide-up">
-            {/* Product Navigation */}
-            <Card>
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <Package2 className="w-5 h-5 text-orange-500" />
-                  Productos ({products.length})
-                </h3>
-                
-                <div className="flex flex-wrap gap-2">
-                  {products.map((product, index) => (
-                    <button
-                      key={product.id}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors 
-                        ${index === currentProductIndex 
-                          ? 'bg-primary text-primary-foreground' 
-                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                        }
-                        ${product.productPhoto ? 'ring-2 ring-green-500/20' : ''}`}
-                      onClick={() => setCurrentProductIndex(index)}
-                    >
-                      Producto {index + 1}
-                      {product.productPhoto && <span className="ml-1 text-xs">✓</span>}
-                    </button>
-                  ))}
-                  
-                  <button
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center gap-1"
-                    onClick={addProduct}
-                  >
-                    <Plus size={14} />
-                    Añadir
-                  </button>
-                </div>
-                
-                {products.length > 1 && (
-                  <button
-                    className="text-destructive text-sm flex items-center gap-1 hover:underline"
-                    onClick={() => removeProduct(currentProductIndex)}
-                  >
-                    <Trash size={14} />
-                    Eliminar producto actual
-                  </button>
-                )}
-              </div>
-            </Card>
-            
-            {/* Current Product Form */}
-            <Card>
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-orange-500" />
-                  Detalles del Producto {currentProductIndex + 1}
-                </h3>
-                
-                {/* Code/Lot Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Código/Lote</label>
-                  <Input
-                    value={currentProduct.code}
-                    onChange={(e) => updateProductField('code', e.target.value)}
-                    placeholder="Ingrese el código o lote"
-                  />
-                </div>
-                
-                {/* Detailed Description Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Descripción Detallada</label>
-                  <Input
-                    value={currentProduct.detailedDescription}
-                    onChange={(e) => updateProductField('detailedDescription', e.target.value)}
-                    placeholder="Ingrese la descripción del producto"
-                  />
-                </div>
-                
-                {/* Quantity Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Cantidad</label>
-                  <Input
-                    type="number"
-                    value={currentProduct.quantity}
-                    onChange={(e) => updateProductField('quantity', parseInt(e.target.value) || 0)}
-                    placeholder="Ingrese la cantidad"
-                  />
-                </div>
-                
-                {/* Unit of Measure Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Unidad de Medida</label>
-                  <select
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={currentProduct.unitOfMeasure}
-                    onChange={(e) => updateProductField('unitOfMeasure', e.target.value)}
-                  >
-                    <option value="">Seleccione unidad</option>
-                    {unitOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                {/* Weight Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Peso (lbs)</label>
-                  <Input
-                    type="number"
-                    value={currentProduct.weight}
-                    onChange={(e) => updateProductField('weight', parseFloat(e.target.value) || 0)}
-                    placeholder="Ingrese el peso en libras"
-                  />
-                </div>
-                
-                {/* Origin Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Origen</label>
-                  <select
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={currentProduct.origin}
-                    onChange={(e) => updateProductField('origin', e.target.value)}
-                  >
-                    <option value="">Seleccione origen</option>
-                    {originOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <ToggleSwitch
-                  label="¿El producto coincide con la información en factura?"
-                  checked={currentProduct.matchesInvoice}
-                  onChange={(value) => updateProductField('matchesInvoice', value)}
-                />
-                
-                {!currentProduct.matchesInvoice && (
-                  <div className="pl-4 border-l-2 border-destructive/20 space-y-2">
-                    <label className="text-sm font-medium">
-                      Registra la discrepancia
-                      <span className="text-destructive ml-1">*</span>
-                    </label>
-                    <textarea
-                      className="w-full h-24 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      value={currentProduct.discrepancy}
-                      onChange={(e) => updateProductField('discrepancy', e.target.value)}
-                      placeholder="Describe la diferencia encontrada respecto a la factura..."
-                    ></textarea>
-                  </div>
-                )}
-              </div>
-            </Card>
-            
-            <Card className="space-y-4">
-              <h3 className="text-lg font-medium flex items-center gap-2">
-                <Camera className="w-5 h-5 text-orange-500" />
-                Documentación Fotográfica
-              </h3>
-              
-              <PhotoCapture
-                label="Capturar Foto de Producto"
-                operationType="previo"
-                operationId={previoId}
-                productId={currentProduct.id}
-                description="Foto general del producto"
-                onPhotoCapture={(photo) => updateProductField('productPhoto', photo)}
-                required
-              />
-              
-              <ToggleSwitch
-                label={
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-orange-500" />
-                    ¿Producto Cuenta con Etiquetado?
-                  </div>
-                }
-                checked={currentProduct.hasLabel}
-                onChange={(value) => updateProductField('hasLabel', value)}
-              />
-              
-              {currentProduct.hasLabel && (
-                <div className="pl-4 border-l-2 border-primary/20">
-                  <PhotoCapture
-                    label="Captura foto de Etiquetado"
-                    operationType="previo"
-                    operationId={previoId}
-                    productId={currentProduct.id}
-                    description="Etiquetado del producto"
-                    onPhotoCapture={(photo) => updateProductField('labelPhoto', photo)}
-                    required
-                  />
-                </div>
-              )}
-              
-              <ToggleSwitch
-                label={
-                  <div className="flex items-center gap-2">
-                    <Scan className="w-4 h-4 text-orange-500" />
-                    ¿Producto Tiene Número de Serie?
-                  </div>
-                }
-                checked={currentProduct.hasSerialNumber}
-                onChange={(value) => updateProductField('hasSerialNumber', value)}
-              />
-              
-              {currentProduct.hasSerialNumber && (
-                <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Ingresar número de serie
-                      <span className="text-destructive ml-1">*</span>
-                    </label>
-                    <Input
-                      type="text"
-                      value={currentProduct.serialNumber}
-                      onChange={(e) => updateProductField('serialNumber', e.target.value)}
-                      placeholder="Ej. SN12345678"
-                    />
-                  </div>
-                  
-                  <PhotoCapture
-                    label="Capturar Número de Serie"
-                    operationType="previo"
-                    operationId={previoId}
-                    productId={currentProduct.id}
-                    description="Número de serie del producto"
-                    onPhotoCapture={(photo) => updateProductField('serialPhoto', photo)}
-                    required
-                  />
-                </div>
-              )}
-              
-              <ToggleSwitch
-                label="¿Producto Tiene Modelo?"
-                checked={currentProduct.hasModel}
-                onChange={(value) => updateProductField('hasModel', value)}
-              />
-              
-              {currentProduct.hasModel && (
-                <div className="pl-4 border-l-2 border-primary/20 space-y-2">
-                  <label className="text-sm font-medium">
-                    Ingresar modelo
-                    <span className="text-destructive ml-1">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    value={currentProduct.modelNumber}
-                    onChange={(e) => updateProductField('modelNumber', e.target.value)}
-                    placeholder="Ej. MD-2023-X"
-                  />
-                </div>
-              )}
-            </Card>
+        <main className="flex-1 pl-5 pr-0 py-4 pb-20">
+          <div className="w-full max-w-3xl mx-auto">
+            <ProductFormFields
+              products={products}
+              currentProductIndex={currentProductIndex}
+              setCurrentProductIndex={setCurrentProductIndex}
+              addProduct={addProduct}
+              removeProduct={removeProduct}
+              updateProductField={updateProductField}
+              previoId={previoId}
+            />
           </div>
         </main>
         
-        {/* Updated Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
-          <div className="container max-w-3xl mx-auto p-4">
+        <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+          <div className="w-full max-w-3xl mx-auto">
             <Button
               onClick={handleSubmit}
-              className="w-full h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full h-10 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"
             >
               <ChevronRight className="w-5 h-5 mr-2" />
               Finalizar y Ver Documento

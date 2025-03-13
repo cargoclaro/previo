@@ -151,7 +151,7 @@ const PrevioList = () => {
       <div className="flex flex-col min-h-screen">
         <Header title="Lista de Previos" />
         
-        <main className="flex-1 px-4 py-6">
+        <main className="flex-1 pl-5 pr-0 py-6">
           <div className="container max-w-4xl mx-auto space-y-6">
             {/* Search and Create Section */}
             <div className="flex flex-col sm:flex-row gap-4">

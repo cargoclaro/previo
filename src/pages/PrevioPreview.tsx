@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -93,7 +92,7 @@ const PrevioPreview = () => {
       <PageTransition>
         <div className="flex flex-col min-h-screen">
           <Header title="Vista Previa de Previo" showBackButton />
-          <main className="flex-1 px-4 py-6">
+          <main className="flex-1 pl-5 pr-0 py-6">
             <div className="container max-w-3xl mx-auto">
               <Card className="p-6 text-center">
                 <p>Cargando datos...</p>
@@ -110,7 +109,7 @@ const PrevioPreview = () => {
       <div className="flex flex-col min-h-screen">
         <Header title="Vista Previa de Previo" showBackButton />
         
-        <main className="flex-1 px-4 py-6 pb-32">
+        <main className="flex-1 pl-5 pr-0 py-6 pb-32">
           <div className="container max-w-3xl mx-auto space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Resumen del Previo</h2>

@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false, classNam
   return (
     <header 
       className={cn(
-        "sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b py-4 px-4 md:py-4 md:px-6 shadow-sm",
+        "sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b py-4 pl-5 pr-0 md:py-4 md:pl-5 md:pr-0 shadow-sm",
         "border-cargo-gray/30",
         className
       )}

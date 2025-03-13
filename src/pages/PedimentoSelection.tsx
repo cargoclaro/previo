@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -9,6 +8,7 @@ import { ChevronRight, FileText, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 interface Previo {
   id: string;
@@ -144,11 +144,11 @@ const PedimentoSelection = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'in-progress':
-        return 'text-blue-600 bg-blue-50';
+        return 'text-blue-600 bg-blue-50 border border-blue-100';
       case 'completed':
-        return 'text-green-600 bg-green-50';
+        return 'text-green-600 bg-green-50 border border-green-100';
       default:
-        return '';
+        return 'text-gray-600 bg-gray-50 border border-gray-100';
     }
   };
 
@@ -182,21 +182,32 @@ const PedimentoSelection = () => {
                     className={`transition-all duration-200 ${selectedPrevio === previo.id ? 'ring-2 ring-primary' : ''}`}
                     onClick={() => setSelectedPrevio(previo.id)}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex gap-3">
-                        <div className="p-2 bg-primary/10 rounded-full text-primary">
-                          <FileText size={20} />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{previo.entry}</h3>
-                          <p className="text-sm text-muted-foreground">{previo.client}</p>
-                          <p className="text-xs text-muted-foreground mt-1">Proveedor: {previo.supplier}</p>
-                          <p className="text-xs text-muted-foreground">Fecha: {previo.date}</p>
+                    <div className="flex flex-col space-y-4">
+                      {/* Header section with title and status */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-4">
+                          <div className="doc-icon">
+                            <FileText size={20} />
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-gray-800">{previo.entry}</h3>
+                            <p className="text-sm text-muted-foreground">{previo.client}</p>
+                            <Badge className={`mt-1.5 history-item-badge ${getStatusColor(previo.status)}`}>
+                              {getStatusText(previo.status)}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(previo.status)}`}>
-                        {getStatusText(previo.status)}
-                      </span>
+
+                      {/* Info section */}
+                      <div className="space-y-2">
+                        <div className="history-item-date">
+                          <span className="font-medium">Proveedor:</span> {previo.supplier}
+                        </div>
+                        <div className="history-item-date">
+                          <span className="font-medium">Fecha:</span> {previo.date}
+                        </div>
+                      </div>
                     </div>
                   </Card>
                 ))}

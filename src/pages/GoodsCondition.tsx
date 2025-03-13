@@ -64,7 +64,7 @@ const GoodsCondition = () => {
       <div className="flex flex-col min-h-screen">
         <Header title="Condición de Mercancía" showBackButton />
         
-        <main className="flex-1 px-4 py-6 pb-20">
+        <main className="flex-1 pl-5 pr-0 py-6 pb-20">
           <div className="container max-w-md mx-auto space-y-6 animate-slide-up">
             <div className="space-y-2">
               <h2 className="text-xl font-medium">Verificación de Embalaje</h2>

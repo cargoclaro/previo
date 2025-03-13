@@ -81,7 +81,7 @@ const Index = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-cargo-light to-white">
         <Header title="Cargo Claro" />
         
-        <main className="flex-1 px-4 py-6 container max-w-md mx-auto flex flex-col">
+        <main className="flex-1 pl-5 pr-0 py-6 container max-w-md mx-auto flex flex-col">
           {user ? (
             <section className="flex-1 flex flex-col space-y-6 animate-slide-up">
               <div>

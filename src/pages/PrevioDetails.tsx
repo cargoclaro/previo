@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -215,7 +214,7 @@ const PrevioDetails = () => {
       <div className="flex flex-col min-h-screen">
         <Header title="Detalles del Previo" showBackButton />
         
-        <main className="flex-1 px-4 py-6">
+        <main className="flex-1 pl-5 pr-0 py-6">
           <div className="container max-w-3xl mx-auto space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Información del Previo</h2>

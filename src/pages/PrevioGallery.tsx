@@ -164,7 +164,7 @@ const PrevioGallery = () => {
       <div className="flex flex-col min-h-screen">
         <Header title="Galería de Fotos" showBackButton />
         
-        <main className="flex-1 px-4 py-6">
+        <main className="flex-1 pl-5 pr-0 py-6">
           <div className="container max-w-4xl mx-auto space-y-6">
             {/* Previo Summary */}
             <Card className="p-6 space-y-4">

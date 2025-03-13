@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/layout/Header';
@@ -18,9 +17,9 @@ const RegisterPrevio = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
         <Header title="Nuevo Previo - Datos del Cliente" showBackButton />
         
-        <main className="flex-1 w-full px-4 py-6 pb-24">
+        <main className="flex-1 w-full px-3 py-4 pb-20">
           <div className="w-full max-w-md mx-auto">
-            <Card className="w-full p-5 shadow-md border-cargo-gray/40 animate-scale-in">
+            <Card className="w-full p-4 shadow-md border-cargo-gray/40 animate-scale-in">
               <PrevioFormFields
                 clientData={clientData}
                 updateField={updateField}
@@ -29,11 +28,11 @@ const RegisterPrevio = () => {
           </div>
         </main>
         
-        <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-4 px-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
           <div className="w-full max-w-md mx-auto">
             <Button
               onClick={handleSubmit}
-              className="w-full h-12 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"
+              className="w-full h-10 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Creando...' : (

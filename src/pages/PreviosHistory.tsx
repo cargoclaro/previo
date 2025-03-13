@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
 import Card from '@/components/common/Card';
-import Button from '@/components/common/Button';
 import { FileText, Calendar, Package, CheckCircle, Search, Filter, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -94,119 +93,111 @@ const PreviosHistory = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'text-green-600 bg-green-50 border border-green-100';
-      case 'in-progress':
-        return 'text-blue-600 bg-blue-50 border border-blue-100';
-      case 'pending':
-        return 'text-orange-600 bg-orange-50 border border-orange-100';
-      default:
-        return 'text-gray-600 bg-gray-50 border border-gray-100';
-    }
-  };
-
   return (
     <PageTransition>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <Header title="Historial de Previos" showBackButton />
         
-        <main className="flex-1 px-0 py-6">
-          <div className="container max-w-full mx-auto space-y-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center px-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                <Input
-                  type="text"
-                  placeholder="Buscar por cliente, entrada..."
-                  className="w-full pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Filter size={18} className="text-muted-foreground" />
-                <select
-                  className="py-2 px-3 border rounded-md bg-white w-full sm:w-auto"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="all">Todos</option>
-                  <option value="completed">Completados</option>
-                  <option value="in-progress">En Progreso</option>
-                </select>
+        <main className="flex-1 px-4 py-6">
+          <div className="container max-w-md mx-auto space-y-4">
+            {/* Search Input */}
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                type="text"
+                placeholder="Buscar por cliente, entrada..."
+                className="w-full pl-10 rounded-md border-gray-200 focus:border-gray-300 focus:ring-0"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            {/* Filter Dropdown */}
+            <div className="relative w-full">
+              <Filter size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <select
+                className="w-full pl-10 pr-8 py-2.5 rounded-md border border-gray-200 bg-white appearance-none"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="all">Todos</option>
+                <option value="completed">Completados</option>
+                <option value="in-progress">En Progreso</option>
+              </select>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
               </div>
             </div>
             
+            {/* Loading State */}
             {isLoading ? (
-              <div className="flex justify-center py-8">
+              <div className="flex justify-center py-10">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
               </div>
             ) : filteredPrevios.length > 0 ? (
-              <div className="space-y-5 px-2">
+              <div className="space-y-4">
                 {filteredPrevios.map((previo) => (
                   <Card 
                     key={previo.id} 
-                    className="hover:shadow-md transition-shadow w-full"
+                    className="p-4 bg-white rounded-md shadow-sm"
                   >
-                    <div className="flex flex-col space-y-4">
-                      {/* Header section with title and status */}
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-4">
-                          <div className="doc-icon">
-                            <FileText size={24} />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-medium text-gray-800">{previo.client}</h3>
-                            <span className={`history-item-badge inline-block mt-1.5 ${getStatusColor(previo.status)}`}>
-                              {getStatusLabel(previo.status)}
-                            </span>
-                          </div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                        <FileText size={20} className="text-orange-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-800">{previo.client}</h3>
+                        <div className="inline-flex items-center px-2 py-0.5 mt-1 bg-green-50 text-green-600 rounded-full text-xs">
+                          <CheckCircle size={14} className="mr-1" />
+                          {getStatusLabel(previo.status)}
                         </div>
                       </div>
-                      
-                      {/* Info section */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="history-item-date">
-                          <Calendar size={16} className="text-gray-500" />
-                          <span className="text-base">{formatDate(previo.date)}</span>
-                        </div>
-                        <div className="history-item-date justify-end">
-                          <Package size={16} className="text-gray-500" />
-                          <span className="text-base font-medium">{previo.packages || 0} bultos</span>
-                        </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm mb-4">
+                      <div className="flex items-center text-gray-600">
+                        <Calendar size={16} className="mr-1.5" />
+                        <span>{formatDate(previo.date)}</span>
                       </div>
+                      <div className="flex items-center text-gray-600">
+                        <Package size={16} className="mr-1.5" />
+                        <span>{previo.packages || 0} bultos</span>
+                      </div>
+                    </div>
 
-                      <div className="space-y-2">
-                        <div className="text-base text-gray-600">
-                          <span className="font-medium">Entrada:</span> {previo.entry}
-                        </div>
-                        <div className="text-base text-gray-600">
-                          <span className="font-medium">Proveedor:</span> {previo.supplier}
-                        </div>
-                      </div>
-                      
-                      {/* Button section */}
-                      <div className="flex justify-center pt-2">
-                        <Button
-                          variant="outline"
-                          className="w-full sm:w-auto text-orange-600 border-orange-200 hover:bg-orange-50 px-8 py-2.5 text-base"
-                          onClick={() => handleViewPrevio(previo.id)}
-                        >
-                          Ver <ArrowRight size={18} className="ml-1.5" />
-                        </Button>
-                      </div>
+                    <div className="bg-gray-50 p-4 rounded-md mb-4">
+                      <table className="w-full text-sm">
+                        <tbody>
+                          <tr>
+                            <td className="text-gray-500 align-middle">Entrada:</td>
+                            <td className="text-gray-700 text-right align-middle">{previo.entry}</td>
+                          </tr>
+                          <tr>
+                            <td className="text-gray-500 pt-2 align-middle">Proveedor:</td>
+                            <td className="text-gray-700 text-right pt-2 align-middle">{previo.supplier}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <button
+                        className="flex items-center text-orange-500 hover:text-orange-600 text-sm"
+                        onClick={() => handleViewPrevio(previo.id)}
+                      >
+                        Ver <ArrowRight size={14} className="ml-1" />
+                      </button>
                     </div>
                   </Card>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 bg-white rounded-lg shadow-sm mx-2">
-                <CheckCircle size={48} className="mx-auto text-orange-300" />
-                <h3 className="mt-4 text-lg font-medium">No hay previos disponibles</h3>
-                <p className="mt-2 text-gray-500">
+              <div className="text-center py-10 bg-white rounded-lg border border-gray-100">
+                <CheckCircle size={36} className="mx-auto text-orange-300 mb-3" />
+                <h3 className="text-lg font-medium text-gray-800">No hay previos disponibles</h3>
+                <p className="mt-2 text-gray-500 max-w-md mx-auto">
                   {searchTerm 
                     ? 'No se encontraron previos con los filtros aplicados' 
                     : statusFilter === 'all' 

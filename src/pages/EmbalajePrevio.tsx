@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import PageTransition from '@/components/layout/PageTransition';
-import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
-import ToggleSwitch from '@/components/common/ToggleSwitch';
-import PhotoCapture from '@/components/common/PhotoCapture';
 import { ChevronRight, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
+import EmbalajeFormFields from '@/components/previo/EmbalajeFormFields';
 
 interface PrevioHeaderData {
   client: string;
@@ -62,10 +59,6 @@ const EmbalajePrevio = () => {
         setPrevioId(data.id);
       }
     }
-    // You might also get it from URL params if available
-    // const params = new URLSearchParams(window.location.search);
-    // const idFromParams = params.get('id');
-    // if (idFromParams) setPrevioId(idFromParams);
   }, []);
 
   useEffect(() => {
@@ -85,13 +78,6 @@ const EmbalajePrevio = () => {
       [field]: value
     }));
   };
-
-  const packageTypes = [
-    { value: 'cajas', label: 'Cajas' },
-    { value: 'pallets', label: 'Pallets' },
-    { value: 'bultos', label: 'Bultos' },
-    { value: 'contenedor', label: 'Contenedor' },
-  ];
 
   const handleSubmit = () => {
     // Basic validation for package details
@@ -149,160 +135,27 @@ const EmbalajePrevio = () => {
 
   return (
     <PageTransition>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-cargo-light/50">
         <Header title="Nuevo Previo - Datos de Embalaje" showBackButton />
         
-        <main className="flex-1 px-4 py-6 pb-32">
-          <div className="container max-w-3xl mx-auto space-y-6">
-            {/* Client Summary */}
-            <Card className="p-6">
-              <h3 className="font-medium mb-4">Resumen del Cliente</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Cliente:</p>
-                  <p className="text-gray-600">{headerData.client}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Entrada:</p>
-                  <p className="text-gray-600">{headerData.entry}</p>
-                </div>
-              </div>
-            </Card>
+        <main className="flex-1 pl-5 pr-0 py-4 pb-20">
+          <div className="w-full max-w-3xl mx-auto">
+            <EmbalajeFormFields
+              headerData={headerData}
+              updateField={updateField}
+              goodPackagingCondition={goodPackagingCondition}
+              setGoodPackagingCondition={setGoodPackagingCondition}
+              hasSeals={hasSeals}
+              setHasSeals={setHasSeals}
+              certifiedPallet={certifiedPallet}
+              setCertifiedPallet={setCertifiedPallet}
+              setPackagingPhoto={setPackagingPhoto}
+              setSealsPhoto={setSealsPhoto}
+              setPalletPhoto={setPalletPhoto}
+              previoId={previoId}
+            />
 
-            {/* Packaging Details */}
-            <Card className="p-6 space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Cantidad de Bultos
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <Input
-                  type="number"
-                  value={headerData.packages || ''}
-                  onChange={(e) => updateField('packages', parseInt(e.target.value) || 0)}
-                  placeholder="Cantidad de bultos"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Tipo de Bulto
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <select
-                  className="w-full px-3 py-2 border rounded-md"
-                  value={headerData.packageType}
-                  onChange={(e) => updateField('packageType', e.target.value)}
-                >
-                  <option value="">Seleccione tipo de bulto</option>
-                  {packageTypes.map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Línea Transportista
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <Input
-                  value={headerData.carrier}
-                  onChange={(e) => updateField('carrier', e.target.value)}
-                  placeholder="Nombre de la línea transportista"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Peso Total (lbs)
-                  <span className="text-destructive ml-1">*</span>
-                </label>
-                <Input
-                  type="number"
-                  value={headerData.totalWeight || ''}
-                  onChange={(e) => updateField('totalWeight', parseFloat(e.target.value) || 0)}
-                  placeholder="Peso total en libras"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Ubicación
-                </label>
-                <Input
-                  value={headerData.location}
-                  onChange={(e) => updateField('location', e.target.value)}
-                  placeholder="Ubicación del embarque"
-                />
-              </div>
-            </Card>
-
-            {/* Package Condition */}
-            <Card className="p-6 space-y-6">
-              <h3 className="font-medium">Condición del Embalaje</h3>
-              
-              <ToggleSwitch
-                label="¿Embalaje viene en buen estado?"
-                checked={goodPackagingCondition}
-                onChange={setGoodPackagingCondition}
-              />
-              
-              {goodPackagingCondition && (
-                <div className="pl-4 border-l-2 border-primary/20">
-                  <PhotoCapture
-                    label="Captura Evidencia De Estado de Embalaje"
-                    operationType="embalaje"
-                    operationId={previoId}
-                    description="Estado del embalaje"
-                    onPhotoCapture={(photo) => setPackagingPhoto(photo)}
-                    required
-                  />
-                </div>
-              )}
-              
-              <ToggleSwitch
-                label="¿El embalaje cuenta con sellos?"
-                checked={hasSeals}
-                onChange={setHasSeals}
-              />
-              
-              {hasSeals && (
-                <div className="pl-4 border-l-2 border-primary/20">
-                  <PhotoCapture
-                    label="Captura Evidencia de Sellos de Embalaje"
-                    operationType="embalaje"
-                    operationId={previoId}
-                    description="Sellos del embalaje"
-                    onPhotoCapture={(photo) => setSealsPhoto(photo)}
-                    required
-                  />
-                </div>
-              )}
-              
-              <ToggleSwitch
-                label="¿Tarima Certificada?"
-                checked={certifiedPallet}
-                onChange={setCertifiedPallet}
-              />
-              
-              {certifiedPallet && (
-                <div className="pl-4 border-l-2 border-primary/20">
-                  <PhotoCapture
-                    label="Tomar foto de Tarima"
-                    operationType="embalaje"
-                    operationId={previoId}
-                    description="Tarima certificada"
-                    onPhotoCapture={(photo) => setPalletPhoto(photo)}
-                    required
-                  />
-                </div>
-              )}
-            </Card>
-
-            <div className="rounded-lg border border-border p-4 bg-amber-50/50">
+            <div className="rounded-lg border border-border p-4 bg-amber-50/50 mt-4">
               <div className="flex gap-3">
                 <AlertCircle className="text-amber-500 flex-shrink-0" size={20} />
                 <p className="text-sm text-amber-700">
@@ -313,14 +166,14 @@ const EmbalajePrevio = () => {
           </div>
         </main>
         
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
-          <div className="container max-w-3xl mx-auto p-4">
+        <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-cargo-gray/30 py-3 px-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+          <div className="w-full max-w-3xl mx-auto">
             <Button
               onClick={handleSubmit}
-              className="w-full h-14 text-base font-medium bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full h-10 text-base font-medium bg-gradient-to-r from-cargo-orange to-orange-500 hover:from-cargo-orange/90 hover:to-orange-500/90 text-white shadow-sm"
             >
-              <ChevronRight className="w-5 h-5 mr-2" />
               Continuar a Productos
+              <ChevronRight className="w-5 h-5 ml-1" />
             </Button>
           </div>
         </div>
