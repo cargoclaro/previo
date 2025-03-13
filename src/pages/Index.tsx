@@ -25,7 +25,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       onClick={onClick} 
       className="hover:translate-y-[-2px] active:translate-y-0 transition-all duration-200"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col items-center text-center gap-3">
         <div className="p-3 bg-gradient-to-br from-cargo-orange/20 to-cargo-orange/10 rounded-full text-cargo-orange">
           {icon}
         </div>
@@ -81,10 +81,10 @@ const Index = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-cargo-light to-white">
         <Header title="Cargo Claro" />
         
-        <main className="flex-1 pl-5 pr-0 py-6 container max-w-md mx-auto flex flex-col">
+        <main className="flex-1 container max-w-md mx-auto flex flex-col py-6 px-4">
           {user ? (
             <section className="flex-1 flex flex-col space-y-6 animate-slide-up">
-              <div>
+              <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-medium tracking-tight text-gray-900">
                   Dashboard de Previos
                 </h2>
