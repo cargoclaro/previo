@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import Card from '@/components/common/Card';
 import ToggleSwitch from '@/components/common/ToggleSwitch';
@@ -60,6 +60,16 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
   previoId
 }) => {
   const currentProduct = products[currentProductIndex];
+  const [customUnit, setCustomUnit] = useState('');
+
+  const handleUnitChange = (event) => {
+    const value = event.target.value;
+    if (value === 'Otro') {
+      updateProductField('unitOfMeasure', customUnit);
+    } else {
+      updateProductField('unitOfMeasure', value);
+    }
+  };
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -173,7 +183,7 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             <select
               className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
               value={currentProduct.unitOfMeasure}
-              onChange={(e) => updateProductField('unitOfMeasure', e.target.value)}
+              onChange={handleUnitChange}
             >
               <option value="">Seleccione unidad</option>
               {unitOptions.map(option => (
@@ -182,6 +192,14 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 </option>
               ))}
             </select>
+            {unitOptions.includes('Otro') && (
+              <input
+                type="text"
+                placeholder="Especifique otra unidad"
+                value={customUnit}
+                onChange={(e) => setCustomUnit(e.target.value)}
+              />
+            )}
           </div>
           
           {/* Weight Field */}
