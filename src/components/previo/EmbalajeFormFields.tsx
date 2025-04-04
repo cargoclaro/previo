@@ -13,7 +13,7 @@ interface PrevioHeaderData {
   packages: number;
   packageType: string;
   carrier: string;
-  totalWeight: number;
+  totalWeight: number; 
   location: string;
   purchaseOrder: string;
   trackingNumber: string;

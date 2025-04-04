@@ -17,7 +17,30 @@ interface PrevioHeaderData {
   revisor?: string;
 }
 
-interface Product {
+// New Product interface with updated field names
+export interface Product {
+  id: string;
+  numero_parte: string;
+  descripcion: string;
+  cantidad: number;
+  unidad_medida: string;
+  pais_origen: string;
+  peso_neto_unitario: number;
+  peso_neto_total: number;
+  peso_bruto: number;
+  marca: string;
+  modelo_lote: string;
+  serie: string;
+  accesorios: string;
+  productPhoto: string | null;
+  hasLabel: boolean;
+  labelPhoto: string | null;
+  matchesInvoice: boolean;
+  discrepancy: string;
+}
+
+// Legacy Product interface for backward compatibility
+export interface LegacyProduct {
   id: string;
   code: string;
   detailedDescription: string;
@@ -37,6 +60,46 @@ interface Product {
   modelNumber: string;
 }
 
+// Function to convert legacy product format to new format
+const convertLegacyProduct = (legacyProduct: LegacyProduct): Product => {
+  return {
+    id: legacyProduct.id,
+    numero_parte: legacyProduct.code,
+    descripcion: legacyProduct.detailedDescription,
+    cantidad: legacyProduct.quantity,
+    unidad_medida: legacyProduct.unitOfMeasure,
+    pais_origen: legacyProduct.origin,
+    peso_neto_unitario: legacyProduct.weight || 0,
+    peso_neto_total: (legacyProduct.quantity * (legacyProduct.weight || 0)),
+    peso_bruto: legacyProduct.weight || 0,
+    marca: legacyProduct.hasModel ? 'No especificada' : 'No especificada',
+    modelo_lote: legacyProduct.hasModel ? legacyProduct.modelNumber : '',
+    serie: legacyProduct.hasSerialNumber ? legacyProduct.serialNumber : '',
+    accesorios: 'No especificados',
+    productPhoto: legacyProduct.productPhoto,
+    hasLabel: legacyProduct.hasLabel,
+    labelPhoto: legacyProduct.labelPhoto,
+    matchesInvoice: legacyProduct.matchesInvoice,
+    discrepancy: legacyProduct.discrepancy
+  };
+};
+
+// Function to ensure we have products in the new format
+const ensureNewProductFormat = (products: Product[] | LegacyProduct[]): Product[] => {
+  // Check if the first product has the new format fields
+  if (products.length === 0) return [];
+  
+  const firstProduct = products[0] as any;
+  
+  if ('numero_parte' in firstProduct) {
+    // Already in new format
+    return products as Product[];
+  } else {
+    // Convert from legacy format
+    return (products as LegacyProduct[]).map(convertLegacyProduct);
+  }
+};
+
 const ORANGE_COLOR = [255, 84, 0]; // RGB for Cargo Claro orange
 const GRAY_COLOR = [128, 128, 128];
 const LIGHT_GRAY = [245, 245, 245];
@@ -48,7 +111,10 @@ const TEXT_COLOR = [33, 33, 33];
  * @param products - The list of products to include in the PDF
  * @returns The jsPDF document object
  */
-const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[]): jsPDF => {
+const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[] | LegacyProduct[]): jsPDF => {
+  // Convert legacy products to new format if needed
+  const convertedProducts = ensureNewProductFormat(products);
+  
   // Create a new PDF document
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -157,12 +223,17 @@ const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[]): jsP
   doc.text('Detalles de Productos', marginLeft + 6, productsY);
   
   // Convert products to table data
-  const productTableData = products.map(product => [
-    product.code,
-    product.detailedDescription,
-    `${product.quantity} ${product.unitOfMeasure}`,
-    `${product.weight || 0} lbs`,
-    product.origin,
+  const productTableData = convertedProducts.map(product => [
+    product.numero_parte,
+    product.descripcion,
+    `${product.cantidad} ${product.unidad_medida}`,
+    product.marca,
+    product.modelo_lote,
+    product.serie,
+    `${product.peso_neto_unitario} lbs`,
+    `${product.peso_neto_total} lbs`,
+    `${product.peso_bruto} lbs`,
+    product.pais_origen,
     product.matchesInvoice ? 'Sí' : 'No',
     product.discrepancy || 'N/A'
   ]);
@@ -172,19 +243,19 @@ const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[]): jsP
     startY: productsY + 5,
     tableWidth: 'auto',
     margin: { left: 7, right: 7 },
-    head: [['Código', 'Descrip.', 'Cantidad', 'Peso', 'Origen', 'Coincide', 'Discrepancia']],
-    body: productTableData.length > 0 ? productTableData : [['No hay productos registrados', '', '', '', '', '', '']],
+    head: [['No. Parte', 'Descripción', 'Cantidad', 'Marca', 'Modelo/Lote', 'Serie', 'Peso Unit.', 'Peso Neto', 'Peso Bruto', 'Origen', 'Coincide', 'Discrepancia']],
+    body: productTableData.length > 0 ? productTableData : [['No hay productos registrados', '', '', '', '', '', '', '', '', '', '', '']],
     theme: 'grid',
     headStyles: {
       fillColor: [ORANGE_COLOR[0], ORANGE_COLOR[1], ORANGE_COLOR[2]] as [number, number, number],
       textColor: [255, 255, 255],
       fontStyle: 'bold',
       halign: 'center',
-      fontSize: 8,
+      fontSize: 7,
       cellPadding: 2
     },
     styles: {
-      fontSize: 8,
+      fontSize: 7,
       cellPadding: 2,
       valign: 'middle',
       overflow: 'linebreak',
@@ -192,13 +263,18 @@ const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[]): jsP
     },
     // Column widths as percentages of available space
     columnStyles: {
-      0: { cellWidth: 15, halign: 'center' }, // Código
-      1: { cellWidth: 30, halign: 'left' },   // Descripción
-      2: { cellWidth: 10, halign: 'center' }, // Cantidad
-      3: { cellWidth: 10, halign: 'center' }, // Peso
-      4: { cellWidth: 10, halign: 'center' }, // Origen
-      5: { cellWidth: 10, halign: 'center' }, // Coincide
-      6: { cellWidth: 15, halign: 'left' }    // Discrepancia
+      0: { cellWidth: 8, halign: 'center' },  // No. Parte
+      1: { cellWidth: 18, halign: 'left' },   // Descripción
+      2: { cellWidth: 7, halign: 'center' },  // Cantidad
+      3: { cellWidth: 8, halign: 'center' },  // Marca
+      4: { cellWidth: 8, halign: 'center' },  // Modelo/Lote
+      5: { cellWidth: 8, halign: 'center' },  // Serie
+      6: { cellWidth: 7, halign: 'center' },  // Peso Unit.
+      7: { cellWidth: 7, halign: 'center' },  // Peso Neto
+      8: { cellWidth: 7, halign: 'center' },  // Peso Bruto
+      9: { cellWidth: 7, halign: 'center' },  // Origen
+      10: { cellWidth: 5, halign: 'center' }, // Coincide
+      11: { cellWidth: 10, halign: 'left' }   // Discrepancia
     },
     didDrawPage: (data) => {
       // Add header to each page
@@ -234,12 +310,12 @@ const createPrevioPDF = (headerData: PrevioHeaderData, products: Product[]): jsP
 /**
  * Generates a PDF document with the form data
  * @param headerData - The form data to include in the PDF
- * @param products - The list of products to include in the PDF
+ * @param products - The list of products to include in the PDF (can be in old or new format)
  * @param filename - Optional custom filename (default: 'previo-report.pdf')
  */
 export const generatePrevioPDF = (
   headerData: PrevioHeaderData,
-  products: Product[],
+  products: Product[] | LegacyProduct[],
   filename: string = 'previo-report.pdf'
 ) => {
   // Create and save the PDF document
@@ -251,9 +327,9 @@ export const generatePrevioPDF = (
 /**
  * Generates a PDF document with the form data and returns it as a data URL for preview
  * @param headerData - The form data to include in the PDF
- * @param products - The list of products to include in the PDF
+ * @param products - The list of products to include in the PDF (can be in old or new format)
  */
-export const generatePrevioDataURL = (headerData: PrevioHeaderData, products: Product[]): string => {
+export const generatePrevioDataURL = (headerData: PrevioHeaderData, products: Product[] | LegacyProduct[]): string => {
   // Create the PDF document and return as data URL
   const doc = createPrevioPDF(headerData, products);
   return doc.output('datauristring');

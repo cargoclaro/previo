@@ -1,28 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import Card from '@/components/common/Card';
 import ToggleSwitch from '@/components/common/ToggleSwitch';
 import PhotoCapture from '@/components/common/PhotoCapture';
-import { Package2, Plus, Trash, Camera, FileText, Scan, Tag } from 'lucide-react';
+import { Package2, Plus, Trash, Camera, FileText, Scan, Tag, Bookmark } from 'lucide-react';
 
 interface Product {
   id: string;
-  code: string;
-  detailedDescription: string;
-  quantity: number;
-  unitOfMeasure: string;
-  weight: number;
-  origin: string;
-  matchesInvoice: boolean;
-  discrepancy: string;
+  numero_parte: string;
+  descripcion: string;
+  cantidad: number;
+  unidad_medida: string;
+  pais_origen: string;
+  peso_neto_unitario: number;
+  peso_neto_total: number;
+  peso_bruto: number;
+  marca: string;
+  modelo_lote: string;
+  serie: string;
+  accesorios: string;
   productPhoto: string | null;
   hasLabel: boolean;
   labelPhoto: string | null;
-  hasSerialNumber: boolean;
-  serialNumber: string;
-  serialPhoto: string | null;
-  hasModel: boolean;
-  modelNumber: string;
+  matchesInvoice: boolean;
+  discrepancy: string;
 }
 
 interface ProductFormFieldsProps {
@@ -110,38 +111,46 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
   const [customUnit, setCustomUnit] = useState('');
   const [customOrigin, setCustomOrigin] = useState('');
 
+  // Update peso_neto_total when cantidad or peso_neto_unitario changes
+  useEffect(() => {
+    if (currentProduct.cantidad && currentProduct.peso_neto_unitario) {
+      const totalWeight = currentProduct.cantidad * currentProduct.peso_neto_unitario;
+      updateProductField('peso_neto_total', totalWeight);
+    }
+  }, [currentProduct.cantidad, currentProduct.peso_neto_unitario]);
+
   const handleUnitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     if (value === 'otros') {
-      updateProductField('unitOfMeasure', customUnit || '');
+      updateProductField('unidad_medida', customUnit || '');
     } else {
-      updateProductField('unitOfMeasure', value);
+      updateProductField('unidad_medida', value);
     }
   };
 
   const handleCustomUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCustomUnit(value);
-    if (!unitOptions.some(opt => opt.value === currentProduct.unitOfMeasure)) {
-      updateProductField('unitOfMeasure', value);
+    if (!unitOptions.some(opt => opt.value === currentProduct.unidad_medida)) {
+      updateProductField('unidad_medida', value);
     }
   };
 
   const handleOriginChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     if (value === 'otros') {
-      updateProductField('origin', customOrigin || '');
+      updateProductField('pais_origen', customOrigin || '');
     } else {
-      updateProductField('origin', value);
+      updateProductField('pais_origen', value);
     }
   };
 
   const handleCustomOriginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCustomOrigin(value);
-    if (!originOptions.some(opt => opt.value === currentProduct.origin) && 
-        !euCountries.some(country => country.value === currentProduct.origin)) {
-      updateProductField('origin', value);
+    if (!originOptions.some(opt => opt.value === currentProduct.pais_origen) && 
+        !euCountries.some(country => country.value === currentProduct.pais_origen)) {
+      updateProductField('pais_origen', value);
     }
   };
 
@@ -201,37 +210,36 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             Detalles del Producto {currentProductIndex + 1}
           </h3>
           
-          {/* Code/Lot Field */}
+          {/* Numero de Parte Field */}
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
               <Package2 className="w-4 h-4 text-cargo-orange" />
-              Código/Lote
-              <span className="text-destructive">*</span>
+              Número de Parte
             </label>
             <Input
-              value={currentProduct.code}
-              onChange={(e) => updateProductField('code', e.target.value)}
-              placeholder="Ingrese el código o lote"
+              value={currentProduct.numero_parte}
+              onChange={(e) => updateProductField('numero_parte', e.target.value)}
+              placeholder="Ingrese el número de parte"
               className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
             />
           </div>
           
-          {/* Detailed Description Field */}
+          {/* Descripcion Field */}
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
               <FileText className="w-4 h-4 text-cargo-orange" />
-              Descripción Detallada
+              Descripción
               <span className="text-destructive">*</span>
             </label>
             <Input
-              value={currentProduct.detailedDescription}
-              onChange={(e) => updateProductField('detailedDescription', e.target.value)}
+              value={currentProduct.descripcion}
+              onChange={(e) => updateProductField('descripcion', e.target.value)}
               placeholder="Ingrese la descripción del producto"
               className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
             />
           </div>
           
-          {/* Quantity Field */}
+          {/* Cantidad Field */}
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
               <Package2 className="w-4 h-4 text-cargo-orange" />
@@ -240,8 +248,8 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             </label>
             <Input
               type="number"
-              value={currentProduct.quantity || ''}
-              onChange={(e) => updateProductField('quantity', parseInt(e.target.value) || '')}
+              value={currentProduct.cantidad || ''}
+              onChange={(e) => updateProductField('cantidad', parseInt(e.target.value) || '')}
               placeholder="Ingrese la cantidad"
               className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
             />
@@ -256,7 +264,7 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             </label>
             <select
               className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-              value={unitOptions.some(opt => opt.value === currentProduct.unitOfMeasure) ? currentProduct.unitOfMeasure : 'otros'}
+              value={unitOptions.some(opt => opt.value === currentProduct.unidad_medida) ? currentProduct.unidad_medida : 'otros'}
               onChange={handleUnitChange}
             >
               <option value="">Seleccione unidad</option>
@@ -266,12 +274,12 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 </option>
               ))}
             </select>
-            {(!unitOptions.some(opt => opt.value === currentProduct.unitOfMeasure) || currentProduct.unitOfMeasure === 'otros') && (
+            {(!unitOptions.some(opt => opt.value === currentProduct.unidad_medida) || currentProduct.unidad_medida === 'otros') && (
               <div className="mt-2">
                 <Input
                   type="text"
                   placeholder="Especifique otra unidad"
-                  value={customUnit || currentProduct.unitOfMeasure}
+                  value={customUnit || currentProduct.unidad_medida}
                   onChange={handleCustomUnitChange}
                   className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
                 />
@@ -279,33 +287,17 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             )}
           </div>
           
-          {/* Weight Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
-              <Package2 className="w-4 h-4 text-cargo-orange" />
-              Peso (lbs)
-              <span className="text-destructive">*</span>
-            </label>
-            <Input
-              type="number"
-              value={currentProduct.weight || ''}
-              onChange={(e) => updateProductField('weight', parseFloat(e.target.value) || '')}
-              placeholder="Ingrese el peso en libras"
-              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-            />
-          </div>
-          
           {/* Origin Field */}
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
               <Package2 className="w-4 h-4 text-cargo-orange" />
-              Origen
+              País de Origen
               <span className="text-destructive">*</span>
             </label>
             <select
               className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-              value={originOptions.some(opt => opt.value === currentProduct.origin) ? currentProduct.origin : 
-                     euCountries.some(country => country.value === currentProduct.origin) ? 'EU' : 'otros'}
+              value={originOptions.some(opt => opt.value === currentProduct.pais_origen) ? currentProduct.pais_origen : 
+                     euCountries.some(country => country.value === currentProduct.pais_origen) ? 'EU' : 'otros'}
               onChange={handleOriginChange}
             >
               <option value="">Seleccione origen</option>
@@ -316,12 +308,12 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               ))}
             </select>
 
-            {currentProduct.origin === 'EU' && (
+            {currentProduct.pais_origen === 'EU' && (
               <div className="mt-2">
                 <select
                   className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-                  value={currentProduct.origin}
-                  onChange={(e) => updateProductField('origin', e.target.value)}
+                  value={currentProduct.pais_origen}
+                  onChange={(e) => updateProductField('pais_origen', e.target.value)}
                 >
                   <option value="">Seleccione país de la UE</option>
                   {euCountries.map(country => (
@@ -333,19 +325,125 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               </div>
             )}
 
-            {(!originOptions.some(opt => opt.value === currentProduct.origin) && 
-              !euCountries.some(country => country.value === currentProduct.origin) || 
-              currentProduct.origin === 'otros') && (
+            {(!originOptions.some(opt => opt.value === currentProduct.pais_origen) && 
+              !euCountries.some(country => country.value === currentProduct.pais_origen) || 
+              currentProduct.pais_origen === 'otros') && (
               <div className="mt-2">
                 <Input
                   type="text"
                   placeholder="Especifique otro origen"
-                  value={customOrigin || currentProduct.origin}
+                  value={customOrigin || currentProduct.pais_origen}
                   onChange={handleCustomOriginChange}
                   className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
                 />
               </div>
             )}
+          </div>
+          
+          {/* Peso Neto Unitario Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Package2 className="w-4 h-4 text-cargo-orange" />
+              Peso Neto Unitario (lbs)
+              <span className="text-destructive">*</span>
+            </label>
+            <Input
+              type="number"
+              value={currentProduct.peso_neto_unitario || ''}
+              onChange={(e) => updateProductField('peso_neto_unitario', parseFloat(e.target.value) || '')}
+              placeholder="Ingrese el peso neto por unidad"
+              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+            />
+          </div>
+          
+          {/* Peso Neto Total Field - Auto-calculated */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Package2 className="w-4 h-4 text-cargo-orange" />
+              Peso Neto Total (lbs)
+              <span className="text-destructive">*</span>
+            </label>
+            <Input
+              type="number"
+              value={currentProduct.peso_neto_total || ''}
+              readOnly
+              className="w-full border-cargo-gray/40 bg-gray-50"
+            />
+            <p className="text-xs text-gray-500">Este valor se calcula automáticamente (Cantidad × Peso Neto Unitario)</p>
+          </div>
+          
+          {/* Peso Bruto Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Package2 className="w-4 h-4 text-cargo-orange" />
+              Peso Bruto (lbs)
+            </label>
+            <Input
+              type="number"
+              value={currentProduct.peso_bruto || ''}
+              onChange={(e) => updateProductField('peso_bruto', parseFloat(e.target.value) || '')}
+              placeholder="Ingrese el peso bruto"
+              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+            />
+          </div>
+          
+          {/* Marca Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Bookmark className="w-4 h-4 text-cargo-orange" />
+              Marca
+            </label>
+            <Input
+              type="text"
+              value={currentProduct.marca || ''}
+              onChange={(e) => updateProductField('marca', e.target.value)}
+              placeholder="Ingrese la marca del producto"
+              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+            />
+          </div>
+          
+          {/* Modelo/Lote Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Tag className="w-4 h-4 text-cargo-orange" />
+              Modelo/Lote
+            </label>
+            <Input
+              type="text"
+              value={currentProduct.modelo_lote || ''}
+              onChange={(e) => updateProductField('modelo_lote', e.target.value)}
+              placeholder="Ingrese el modelo o lote"
+              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+            />
+          </div>
+          
+          {/* Serie Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Scan className="w-4 h-4 text-cargo-orange" />
+              Número de Serie
+            </label>
+            <Input
+              type="text"
+              value={currentProduct.serie || ''}
+              onChange={(e) => updateProductField('serie', e.target.value)}
+              placeholder="Ingrese el número de serie"
+              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+            />
+          </div>
+          
+          {/* Accesorios Field */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gray-700">
+              <Package2 className="w-4 h-4 text-cargo-orange" />
+              Accesorios
+            </label>
+            <textarea
+              className="w-full h-24 px-3 py-2 border border-cargo-gray/40 rounded-md focus:outline-none focus:ring-2 focus:ring-cargo-orange/60"
+              value={currentProduct.accesorios || ''}
+              onChange={(e) => updateProductField('accesorios', e.target.value)}
+              placeholder="Describa los accesorios incluidos con el producto..."
+            ></textarea>
           </div>
           
           <ToggleSwitch
@@ -384,7 +482,6 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
           productId={currentProduct.id}
           description="Foto general del producto"
           onPhotoCapture={(photo) => updateProductField('productPhoto', photo)}
-          required
         />
         
         <ToggleSwitch
@@ -408,67 +505,6 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               description="Etiquetado del producto"
               onPhotoCapture={(photo) => updateProductField('labelPhoto', photo)}
               required
-            />
-          </div>
-        )}
-        
-        <ToggleSwitch
-          label={
-            <div className="flex items-center gap-2">
-              <Scan className="w-4 h-4 text-cargo-orange" />
-              ¿Producto Tiene Número de Serie?
-            </div>
-          }
-          checked={currentProduct.hasSerialNumber}
-          onChange={(value) => updateProductField('hasSerialNumber', value)}
-        />
-        
-        {currentProduct.hasSerialNumber && (
-          <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Ingresar número de serie
-                <span className="text-destructive ml-1">*</span>
-              </label>
-              <Input
-                type="text"
-                value={currentProduct.serialNumber}
-                onChange={(e) => updateProductField('serialNumber', e.target.value)}
-                placeholder="Ej. SN12345678"
-                className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-              />
-            </div>
-            
-            <PhotoCapture
-              label="Capturar Número de Serie"
-              operationType="previo"
-              operationId={previoId}
-              productId={currentProduct.id}
-              description="Número de serie del producto"
-              onPhotoCapture={(photo) => updateProductField('serialPhoto', photo)}
-              required
-            />
-          </div>
-        )}
-        
-        <ToggleSwitch
-          label="¿Producto Tiene Modelo?"
-          checked={currentProduct.hasModel}
-          onChange={(value) => updateProductField('hasModel', value)}
-        />
-        
-        {currentProduct.hasModel && (
-          <div className="pl-4 border-l-2 border-primary/20 space-y-2">
-            <label className="text-sm font-medium">
-              Ingresar modelo
-              <span className="text-destructive ml-1">*</span>
-            </label>
-            <Input
-              type="text"
-              value={currentProduct.modelNumber}
-              onChange={(e) => updateProductField('modelNumber', e.target.value)}
-              placeholder="Ej. MD-2023-X"
-              className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
             />
           </div>
         )}

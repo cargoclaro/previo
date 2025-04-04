@@ -12,22 +12,23 @@ import Card from '@/components/common/Card';
 // Define the Product type
 interface Product {
   id: string;
-  code: string;
-  detailedDescription: string;
-  quantity: number;
-  unitOfMeasure: string;
-  weight: number;
-  origin: string;
-  matchesInvoice: boolean;
-  discrepancy: string;
+  numero_parte: string;
+  descripcion: string;
+  cantidad: number;
+  unidad_medida: string;
+  pais_origen: string;
+  peso_neto_unitario: number;
+  peso_neto_total: number;
+  peso_bruto: number;
+  marca: string;
+  modelo_lote: string;
+  serie: string;
+  accesorios: string;
   productPhoto: string | null;
   hasLabel: boolean;
   labelPhoto: string | null;
-  hasSerialNumber: boolean;
-  serialNumber: string;
-  serialPhoto: string | null;
-  hasModel: boolean;
-  modelNumber: string;
+  matchesInvoice: boolean;
+  discrepancy: string;
 }
 
 // Add header interface
@@ -51,22 +52,23 @@ const ProductVerification = () => {
   // State for managing multiple products
   const [products, setProducts] = useState<Product[]>([{
     id: `product-${Date.now()}`,
-    code: '',
-    detailedDescription: '',
-    quantity: 0,
-    unitOfMeasure: '',
-    weight: 0,
-    origin: '',
-    matchesInvoice: true,
-    discrepancy: '',
+    numero_parte: '',
+    descripcion: '',
+    cantidad: 0,
+    unidad_medida: '',
+    pais_origen: '',
+    peso_neto_unitario: 0,
+    peso_neto_total: 0,
+    peso_bruto: 0,
+    marca: '',
+    modelo_lote: '',
+    serie: '',
+    accesorios: '',
     productPhoto: null,
     hasLabel: false,
     labelPhoto: null,
-    hasSerialNumber: false,
-    serialNumber: '',
-    serialPhoto: null,
-    hasModel: false,
-    modelNumber: ''
+    matchesInvoice: true,
+    discrepancy: ''
   }]);
   
   // Current product being edited
@@ -97,22 +99,23 @@ const ProductVerification = () => {
   const addProduct = () => {
     const newProduct: Product = {
       id: `product-${Date.now()}`,
-      code: '',
-      detailedDescription: '',
-      quantity: 0,
-      unitOfMeasure: '',
-      weight: 0,
-      origin: '',
-      matchesInvoice: true,
-      discrepancy: '',
+      numero_parte: '',
+      descripcion: '',
+      cantidad: 0,
+      unidad_medida: '',
+      pais_origen: '',
+      peso_neto_unitario: 0,
+      peso_neto_total: 0,
+      peso_bruto: 0,
+      marca: '',
+      modelo_lote: '',
+      serie: '',
+      accesorios: '',
       productPhoto: null,
       hasLabel: false,
       labelPhoto: null,
-      hasSerialNumber: false,
-      serialNumber: '',
-      serialPhoto: null,
-      hasModel: false,
-      modelNumber: ''
+      matchesInvoice: true,
+      discrepancy: ''
     };
     
     setProducts([...products, newProduct]);
@@ -154,62 +157,52 @@ const ProductVerification = () => {
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
       
-      if (!product.code) {
-        toast.error(`Producto ${i + 1}: Ingrese el código o lote`);
+      if (!product.descripcion) {
+        toast.error(`Producto ${i + 1}: Ingrese la descripción`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.detailedDescription) {
-        toast.error(`Producto ${i + 1}: Ingrese la descripción detallada`);
-        setCurrentProductIndex(i);
-        return false;
-      }
-      
-      if (!product.quantity) {
+      if (!product.cantidad) {
         toast.error(`Producto ${i + 1}: Ingrese la cantidad`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.unitOfMeasure) {
+      if (!product.unidad_medida) {
         toast.error(`Producto ${i + 1}: Seleccione la unidad de medida`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.weight) {
-        toast.error(`Producto ${i + 1}: Ingrese el peso`);
+      if (!product.pais_origen) {
+        toast.error(`Producto ${i + 1}: Seleccione el país de origen`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.origin) {
-        toast.error(`Producto ${i + 1}: Seleccione el origen`);
+      if (!product.peso_neto_unitario) {
+        toast.error(`Producto ${i + 1}: Ingrese el peso neto unitario`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (!product.productPhoto) {
-        toast.error(`Producto ${i + 1}: Capture foto del producto`);
+      if (!product.peso_neto_total) {
+        toast.error(`Producto ${i + 1}: El peso neto total debe ser calculado`);
         setCurrentProductIndex(i);
         return false;
       }
       
+      // Only validate label photo if hasLabel is true
       if (product.hasLabel && !product.labelPhoto) {
         toast.error(`Producto ${i + 1}: Capture foto del etiquetado`);
         setCurrentProductIndex(i);
         return false;
       }
       
-      if (product.hasSerialNumber && (!product.serialNumber || !product.serialPhoto)) {
-        toast.error(`Producto ${i + 1}: Ingrese y capture el número de serie`);
-        setCurrentProductIndex(i);
-        return false;
-      }
-      
-      if (product.hasModel && !product.modelNumber) {
-        toast.error(`Producto ${i + 1}: Ingrese el número de modelo`);
+      // Only validate discrepancy if matchesInvoice is false
+      if (!product.matchesInvoice && !product.discrepancy) {
+        toast.error(`Producto ${i + 1}: Registre la discrepancia con la factura`);
         setCurrentProductIndex(i);
         return false;
       }
