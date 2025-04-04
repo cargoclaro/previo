@@ -161,7 +161,7 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
         <div className="space-y-4">
           <h3 className="text-lg font-medium flex items-center gap-2">
             <Package2 className="w-5 h-5 text-cargo-orange" />
-            Productos ({products.length})
+            Partidas ({products.length})
           </h3>
           
           <div className="flex flex-wrap gap-2">
@@ -176,7 +176,7 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                   ${product.productPhoto ? 'ring-2 ring-green-500/20' : ''}`}
                 onClick={() => setCurrentProductIndex(index)}
               >
-                Producto {index + 1}
+                Partida {index + 1}
                 {product.productPhoto && <span className="ml-1 text-xs">✓</span>}
               </button>
             ))}
