@@ -11,12 +11,13 @@ import { toast } from 'sonner';
 interface ProductData {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   quantity: number;
-  weight: number;
-  serial_number: string;
-  image_url: string;
+  weight: number | null;
+  serial_number: string | null;
+  image_url: string | null;
   previo_id: string;
+  created_at: string;
 }
 
 interface PrevioData {

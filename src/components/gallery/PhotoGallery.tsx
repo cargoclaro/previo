@@ -11,9 +11,11 @@ interface PhotoGalleryProps {
 interface GalleryImage {
   id: string;
   url: string;
-  operation_type: OperationType;
-  description: string;
-  product_id?: string;
+  operation_type: string;
+  operation_id: string;
+  product_id: string | null;
+  description: string | null;
+  file_path: string;
   created_at: string;
 }
 
@@ -83,7 +85,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     });
   };
   
-  const downloadImage = (url: string, description: string) => {
+  const downloadImage = (url: string, description: string | null) => {
     const link = document.createElement('a');
     link.href = url;
     link.download = `${description || 'imagen'}_${new Date().getTime()}.jpg`;

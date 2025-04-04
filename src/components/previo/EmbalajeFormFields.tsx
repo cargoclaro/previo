@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import Card from '@/components/common/Card';
 import ToggleSwitch from '@/components/common/ToggleSwitch';
@@ -39,6 +39,14 @@ const packageTypes = [
   { value: 'pallets', label: 'Pallets' },
   { value: 'bultos', label: 'Bultos' },
   { value: 'contenedor', label: 'Contenedor' },
+  { value: 'sacos', label: 'Sacos' },
+  { value: 'rollos', label: 'Rollos' },
+  { value: 'tambores', label: 'Tambores' },
+  { value: 'bidones', label: 'Bidones' },
+  { value: 'piezas_sueltas', label: 'Piezas Sueltas' },
+  { value: 'atados', label: 'Atados' },
+  { value: 'bobinas', label: 'Bobinas' },
+  { value: 'otros', label: 'Otros' }
 ];
 
 const EmbalajeFormFields: React.FC<EmbalajeFormFieldsProps> = ({
@@ -55,6 +63,25 @@ const EmbalajeFormFields: React.FC<EmbalajeFormFieldsProps> = ({
   setPalletPhoto,
   previoId
 }) => {
+  const [customPackageType, setCustomPackageType] = useState('');
+
+  const handlePackageTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === 'otros') {
+      updateField('packageType', customPackageType || 'Otro tipo');
+    } else {
+      updateField('packageType', value);
+    }
+  };
+
+  const handleCustomPackageTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomPackageType(value);
+    if (headerData.packageType === 'otros') {
+      updateField('packageType', value);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Client Summary */}
@@ -97,8 +124,8 @@ const EmbalajeFormFields: React.FC<EmbalajeFormFieldsProps> = ({
           </label>
           <select
             className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-            value={headerData.packageType}
-            onChange={(e) => updateField('packageType', e.target.value)}
+            value={packageTypes.some(type => type.value === headerData.packageType) ? headerData.packageType : 'otros'}
+            onChange={handlePackageTypeChange}
           >
             <option value="">Seleccione tipo de bulto</option>
             {packageTypes.map(type => (
@@ -107,6 +134,18 @@ const EmbalajeFormFields: React.FC<EmbalajeFormFieldsProps> = ({
               </option>
             ))}
           </select>
+          
+          {(headerData.packageType === 'otros' || 
+            (!packageTypes.some(type => type.value === headerData.packageType) && headerData.packageType)) && (
+            <div className="mt-2">
+              <Input
+                value={customPackageType || headerData.packageType}
+                onChange={handleCustomPackageTypeChange}
+                placeholder="Especifique el tipo de bulto"
+                className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+              />
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">

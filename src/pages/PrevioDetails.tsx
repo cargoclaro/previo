@@ -17,23 +17,29 @@ interface PrevioData {
   entry: string;
   supplier: string;
   packages: number;
-  package_type: string;
-  carrier: string;
-  total_weight: number;
-  location: string;
-  purchase_order: string;
-  tracking_number: string;
+  package_type: string | null;
+  carrier: string | null;
+  total_weight: number | null;
+  location: string | null;
+  purchase_order: string | null;
+  tracking_number: string | null;
   status: string;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  organization_id: string;
 }
 
 interface ProductData {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   quantity: number;
-  weight: number;
-  serial_number: string;
-  image_url: string;
+  weight: number | null;
+  serial_number: string | null;
+  image_url: string | null;
+  previo_id: string;
+  created_at: string;
 }
 
 const PrevioDetails = () => {

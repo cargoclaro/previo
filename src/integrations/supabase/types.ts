@@ -27,6 +27,54 @@ export type Database = {
         }
         Relationships: []
       }
+      operation_images: {
+        Row: {
+          id: string
+          url: string
+          operation_type: string
+          operation_id: string
+          product_id: string | null
+          description: string | null
+          file_path: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          url: string
+          operation_type: string
+          operation_id: string
+          product_id?: string | null
+          description?: string | null
+          file_path: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          url?: string
+          operation_type?: string
+          operation_id?: string
+          product_id?: string | null
+          description?: string | null
+          file_path?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_images_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "previos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operation_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       previos: {
         Row: {
           carrier: string | null

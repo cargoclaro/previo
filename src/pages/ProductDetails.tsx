@@ -12,16 +12,13 @@ import { toast } from 'sonner';
 interface ProductData {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   quantity: number;
-  weight: number;
-  serial_number: string;
-  image_url: string;
+  weight: number | null;
+  serial_number: string | null;
+  image_url: string | null;
   previo_id: string;
-  label_photo_url?: string;
-  serial_photo_url?: string;
-  has_label?: boolean;
-  has_serial_number?: boolean;
+  created_at: string;
 }
 
 interface PrevioData {
@@ -235,7 +232,7 @@ const ProductDetails = () => {
                                   src={product.image_url} 
                                   alt={product.name} 
                                   className="w-full object-contain border rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
-                                  onClick={() => window.open(product.image_url, '_blank')}
+                                  onClick={() => product.image_url && window.open(product.image_url, '_blank')}
                                 />
                               </div>
                             </div>

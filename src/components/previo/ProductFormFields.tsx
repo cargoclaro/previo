@@ -36,18 +36,65 @@ interface ProductFormFieldsProps {
 }
 
 const unitOptions = [
-  { value: 'sacos', label: 'Sacos' },
-  { value: 'cajas', label: 'Cajas' },
-  { value: 'piezas', label: 'Piezas' },
-  { value: 'pallets', label: 'Pallets' },
+  { value: 'kilo', label: 'KILO' },
+  { value: 'gramo', label: 'GRAMO' },
+  { value: 'metro_lineal', label: 'METRO LINEAL' },
+  { value: 'metro_cuadrado', label: 'METRO CUADRADO' },
+  { value: 'metro_cubico', label: 'METRO CUBICO' },
+  { value: 'pieza', label: 'PIEZA' },
+  { value: 'cabeza', label: 'CABEZA' },
+  { value: 'litro', label: 'LITRO' },
+  { value: 'par', label: 'PAR' },
+  { value: 'kilowatt', label: 'KILOWATT' },
+  { value: 'millar', label: 'MILLAR' },
+  { value: 'juego', label: 'JUEGO' },
+  { value: 'kilowatt_hora', label: 'KILOWATT/HORA' },
+  { value: 'tonelada', label: 'TONELADA' },
+  { value: 'barril', label: 'BARRIL' },
+  { value: 'gramo_neto', label: 'GRAMO NETO' },
+  { value: 'decenas', label: 'DECENAS' },
+  { value: 'cientos', label: 'CIENTOS' },
+  { value: 'docenas', label: 'DOCENAS' },
+  { value: 'caja', label: 'CAJA' },
+  { value: 'botella', label: 'BOTELLA' },
+  { value: 'otros', label: 'OTROS' }
+];
+
+const euCountries = [
+  { value: 'alemania', label: 'Alemania' },
+  { value: 'austria', label: 'Austria' },
+  { value: 'belgica', label: 'Bélgica' },
+  { value: 'bulgaria', label: 'Bulgaria' },
+  { value: 'chipre', label: 'Chipre' },
+  { value: 'croacia', label: 'Croacia' },
+  { value: 'dinamarca', label: 'Dinamarca' },
+  { value: 'eslovaquia', label: 'Eslovaquia' },
+  { value: 'eslovenia', label: 'Eslovenia' },
+  { value: 'espana', label: 'España' },
+  { value: 'estonia', label: 'Estonia' },
+  { value: 'finlandia', label: 'Finlandia' },
+  { value: 'francia', label: 'Francia' },
+  { value: 'grecia', label: 'Grecia' },
+  { value: 'hungria', label: 'Hungría' },
+  { value: 'irlanda', label: 'Irlanda' },
+  { value: 'italia', label: 'Italia' },
+  { value: 'letonia', label: 'Letonia' },
+  { value: 'lituania', label: 'Lituania' },
+  { value: 'luxemburgo', label: 'Luxemburgo' },
+  { value: 'malta', label: 'Malta' },
+  { value: 'paises_bajos', label: 'Países Bajos' },
+  { value: 'polonia', label: 'Polonia' },
+  { value: 'portugal', label: 'Portugal' },
+  { value: 'republica_checa', label: 'República Checa' },
+  { value: 'rumania', label: 'Rumanía' },
+  { value: 'suecia', label: 'Suecia' }
 ];
 
 const originOptions = [
-  { value: 'USA', label: 'USA' },
-  { value: 'Germany', label: 'Germany' },
-  { value: 'Mexico', label: 'México' },
+  { value: 'USA', label: 'Estados Unidos' },
   { value: 'China', label: 'China' },
-  { value: 'Other', label: 'Otro' },
+  { value: 'EU', label: 'Unión Europea' },
+  { value: 'otros', label: 'Otros' }
 ];
 
 const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
@@ -61,13 +108,40 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
 }) => {
   const currentProduct = products[currentProductIndex];
   const [customUnit, setCustomUnit] = useState('');
+  const [customOrigin, setCustomOrigin] = useState('');
 
-  const handleUnitChange = (event) => {
+  const handleUnitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    if (value === 'Otro') {
-      updateProductField('unitOfMeasure', customUnit);
+    if (value === 'otros') {
+      updateProductField('unitOfMeasure', customUnit || '');
     } else {
       updateProductField('unitOfMeasure', value);
+    }
+  };
+
+  const handleCustomUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomUnit(value);
+    if (!unitOptions.some(opt => opt.value === currentProduct.unitOfMeasure)) {
+      updateProductField('unitOfMeasure', value);
+    }
+  };
+
+  const handleOriginChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (value === 'otros') {
+      updateProductField('origin', customOrigin || '');
+    } else {
+      updateProductField('origin', value);
+    }
+  };
+
+  const handleCustomOriginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomOrigin(value);
+    if (!originOptions.some(opt => opt.value === currentProduct.origin) && 
+        !euCountries.some(country => country.value === currentProduct.origin)) {
+      updateProductField('origin', value);
     }
   };
 
@@ -166,8 +240,8 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             </label>
             <Input
               type="number"
-              value={currentProduct.quantity}
-              onChange={(e) => updateProductField('quantity', parseInt(e.target.value) || 0)}
+              value={currentProduct.quantity || ''}
+              onChange={(e) => updateProductField('quantity', parseInt(e.target.value) || '')}
               placeholder="Ingrese la cantidad"
               className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
             />
@@ -182,7 +256,7 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             </label>
             <select
               className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-              value={currentProduct.unitOfMeasure}
+              value={unitOptions.some(opt => opt.value === currentProduct.unitOfMeasure) ? currentProduct.unitOfMeasure : 'otros'}
               onChange={handleUnitChange}
             >
               <option value="">Seleccione unidad</option>
@@ -192,13 +266,16 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 </option>
               ))}
             </select>
-            {unitOptions.includes('Otro') && (
-              <input
-                type="text"
-                placeholder="Especifique otra unidad"
-                value={customUnit}
-                onChange={(e) => setCustomUnit(e.target.value)}
-              />
+            {(!unitOptions.some(opt => opt.value === currentProduct.unitOfMeasure) || currentProduct.unitOfMeasure === 'otros') && (
+              <div className="mt-2">
+                <Input
+                  type="text"
+                  placeholder="Especifique otra unidad"
+                  value={customUnit || currentProduct.unitOfMeasure}
+                  onChange={handleCustomUnitChange}
+                  className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                />
+              </div>
             )}
           </div>
           
@@ -211,8 +288,8 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             </label>
             <Input
               type="number"
-              value={currentProduct.weight}
-              onChange={(e) => updateProductField('weight', parseFloat(e.target.value) || 0)}
+              value={currentProduct.weight || ''}
+              onChange={(e) => updateProductField('weight', parseFloat(e.target.value) || '')}
               placeholder="Ingrese el peso en libras"
               className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
             />
@@ -227,8 +304,9 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             </label>
             <select
               className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
-              value={currentProduct.origin}
-              onChange={(e) => updateProductField('origin', e.target.value)}
+              value={originOptions.some(opt => opt.value === currentProduct.origin) ? currentProduct.origin : 
+                     euCountries.some(country => country.value === currentProduct.origin) ? 'EU' : 'otros'}
+              onChange={handleOriginChange}
             >
               <option value="">Seleccione origen</option>
               {originOptions.map(option => (
@@ -237,6 +315,37 @@ const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 </option>
               ))}
             </select>
+
+            {currentProduct.origin === 'EU' && (
+              <div className="mt-2">
+                <select
+                  className="w-full px-3 py-2 border rounded-md border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                  value={currentProduct.origin}
+                  onChange={(e) => updateProductField('origin', e.target.value)}
+                >
+                  <option value="">Seleccione país de la UE</option>
+                  {euCountries.map(country => (
+                    <option key={country.value} value={country.value}>
+                      {country.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {(!originOptions.some(opt => opt.value === currentProduct.origin) && 
+              !euCountries.some(country => country.value === currentProduct.origin) || 
+              currentProduct.origin === 'otros') && (
+              <div className="mt-2">
+                <Input
+                  type="text"
+                  placeholder="Especifique otro origen"
+                  value={customOrigin || currentProduct.origin}
+                  onChange={handleCustomOriginChange}
+                  className="w-full border-cargo-gray/40 focus-visible:ring-cargo-orange/60"
+                />
+              </div>
+            )}
           </div>
           
           <ToggleSwitch

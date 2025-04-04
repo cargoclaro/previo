@@ -5,9 +5,10 @@ import PageTransition from '@/components/layout/PageTransition';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, FilePlus, Image, Package2, ExternalLink, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Search, FilePlus, Image, Package2, ExternalLink, CheckCircle2, Clock, AlertCircle, Eye, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PrevioSummary {
   id: string;
@@ -22,7 +23,7 @@ interface PrevioSummary {
   image_count?: number;
 }
 
-const PrevioList = () => {
+const PrevioList: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [previos, setPrevios] = useState<PrevioSummary[]>([]);
@@ -48,32 +49,44 @@ const PrevioList = () => {
         // Get product counts for each previo
         const previoIds = previosData.map(p => p.id);
         
-        // Get product counts via products table
-        const { data: productCounts, error: productError } = await supabase
+        // Get basic product info and count them manually in JavaScript
+        const { data: allProducts, error: productError } = await supabase
           .from('products')
-          .select('previo_id, count(*)')
-          .in('previo_id', previoIds)
-          .group('previo_id');
-          
+          .select('previo_id')
+          .in('previo_id', previoIds);
+
         if (productError) {
-          console.error('Error fetching product counts:', productError);
+          console.error('Error fetching products:', productError);
         }
-        
-        // Get image counts via operation_images table
-        const { data: imageCounts, error: imageError } = await supabase
+
+        // Create product counts map
+        const productCounts = allProducts ? 
+          previoIds.map(id => ({
+            previo_id: id,
+            count: allProducts.filter(p => p.previo_id === id).length
+          })) : [];
+
+        // Get basic image info and count them manually in JavaScript
+        const { data: allImages, error: imageError } = await supabase
           .from('operation_images')
-          .select('operation_id, count(*)')
-          .in('operation_id', previoIds)
-          .group('operation_id');
-          
+          .select('operation_id')
+          .in('operation_id', previoIds);
+
         if (imageError) {
-          console.error('Error fetching image counts:', imageError);
+          console.error('Error fetching images:', imageError);
         }
+
+        // Create image counts map
+        const imageCounts = allImages ? 
+          previoIds.map(id => ({
+            operation_id: id,
+            count: allImages.filter(i => i.operation_id === id).length
+          })) : [];
         
         // Format previos data
         const formattedPrevios = previosData.map(previo => {
-          const productCount = productCounts?.find(p => p.previo_id === previo.id)?.count || 0;
-          const imageCount = imageCounts?.find(i => i.operation_id === previo.id)?.count || 0;
+          const productCount = productCounts?.find((p: { previo_id: string; count: number }) => p.previo_id === previo.id)?.count || 0;
+          const imageCount = imageCounts?.find((i: { operation_id: string; count: number }) => i.operation_id === previo.id)?.count || 0;
           
           return {
             id: previo.id,
@@ -143,6 +156,31 @@ const PrevioList = () => {
             Pendiente
           </span>
         );
+    }
+  };
+  
+  // Add the handleContinuePrevio function
+  const handleContinuePrevio = (previo: any) => {
+    // Save previo data to localStorage
+    localStorage.setItem('previoHeader', JSON.stringify({
+      client: previo.client,
+      date: previo.date,
+      entry: previo.entry,
+      supplier: previo.supplier,
+      packages: previo.packages,
+      packageType: previo.package_type,
+      carrier: previo.carrier,
+      totalWeight: previo.total_weight,
+      location: previo.location,
+      purchaseOrder: previo.purchase_order,
+      trackingNumber: previo.tracking_number
+    }));
+    
+    // Navigate to the appropriate page based on the previo status
+    if (previo.status === 'in-progress') {
+      navigate('/product-verification');
+    } else {
+      navigate('/previo-preview');
     }
   };
   
@@ -223,21 +261,25 @@ const PrevioList = () => {
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           variant="outline"
-                          size="sm"
-                          className="flex items-center gap-1"
-                          onClick={() => navigate(`/previo/${previo.id}`)}
+                          className="flex items-center gap-1 text-xs"
+                          onClick={() => {
+                            // Navigate to previo details
+                            navigate(`/previo/${previo.id}`);
+                          }}
                         >
-                          <ExternalLink size={14} />
-                          Detalles
+                          <Eye size={16} />
+                          Ver
                         </Button>
                         
                         <Button
-                          size="sm"
-                          className="flex items-center gap-1"
-                          onClick={() => navigate(`/gallery/${previo.id}`)}
+                          className="flex items-center gap-1 text-xs"
+                          onClick={() => {
+                            // Navigate to continue previo
+                            handleContinuePrevio(previo);
+                          }}
                         >
-                          <Image size={14} />
-                          Galería
+                          <ArrowRight size={16} />
+                          Continuar
                         </Button>
                       </div>
                     </div>

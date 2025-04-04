@@ -30,10 +30,14 @@ interface PrevioDetail {
 // Define product interface
 interface Product {
   id: string;
-  code: string;
-  detailedDescription: string;
+  name: string;
+  description: string | null;
   quantity: number;
-  matchesInvoice: boolean;
+  weight: number | null;
+  serial_number: string | null;
+  image_url: string | null;
+  previo_id: string;
+  created_at: string;
 }
 
 const PrevioGallery = () => {
@@ -270,21 +274,27 @@ const PrevioGallery = () => {
                       {selectedProduct && (
                         <div className="space-y-4">
                           <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="font-medium mb-2">{selectedProduct.detailedDescription}</h3>
+                            <h3 className="font-medium mb-2">{selectedProduct.name}</h3>
                             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                               <div>
-                                <span className="text-gray-500">Código/Lote:</span>{' '}
-                                <span className="font-medium">{selectedProduct.code}</span>
+                                <span className="text-gray-500">Descripción:</span>{' '}
+                                <span className="font-medium">{selectedProduct.description}</span>
                               </div>
                               <div>
                                 <span className="text-gray-500">Cantidad:</span>{' '}
                                 <span className="font-medium">{selectedProduct.quantity}</span>
                               </div>
-                              <div className="col-span-2">
-                                <span className="text-gray-500">Coincide con factura:</span>{' '}
-                                <span className={`font-medium ${selectedProduct.matchesInvoice ? 'text-green-600' : 'text-red-600'}`}>
-                                  {selectedProduct.matchesInvoice ? 'Sí' : 'No'}
-                                </span>
+                              <div>
+                                <span className="text-gray-500">Peso:</span>{' '}
+                                <span className="font-medium">{selectedProduct.weight} lbs</span>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Número de Serie:</span>{' '}
+                                <span className="font-medium">{selectedProduct.serial_number}</span>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">URL de Imagen:</span>{' '}
+                                <span className="font-medium">{selectedProduct.image_url}</span>
                               </div>
                             </div>
                           </div>
